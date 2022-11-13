@@ -3,17 +3,25 @@
 namespace Madridianfox\LaravelMetrics;
 
 use Illuminate\Support\ServiceProvider;
-use Madridianfox\LaravelMetrics\LabelProcessors\HttpRequestLabels;
-use Madridianfox\LaravelPrometheus\Prometheus;
+use Madridianfox\LaravelMetrics\LabelProcessors\HttpRequestLabelProvider;
+use Madridianfox\LaravelPrometheus\PrometheusManager;
 
 class MetricsServiceProvider extends ServiceProvider
 {
+    public function register()
+    {
+        $this->app->singleton(LatencyProfiler::class);
+    }
+
     public function boot()
     {
-        /** @var Prometheus $prometheus */
-        $prometheus = resolve(Prometheus::class);
+        /** @var PrometheusManager $prometheus */
+        $prometheus = resolve(PrometheusManager::class);
+        $metricsBag = $prometheus->defaultBag('web');
 
-        $prometheus->addLabelProcessor(new HttpRequestLabels());
-        $prometheus->declareCounter('http_request', ['code']);
+        $metricsBag->addLabelProcessor(HttpRequestLabelProvider::class);
+
+        $metricsBag->declareCounter('http_request', ['code']);
+        $metricsBag->declareCounter('http_request_seconds', ['code', 'type']);
     }
 }
