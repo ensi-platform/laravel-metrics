@@ -3,6 +3,7 @@
 namespace Madridianfox\LaravelMetrics\LabelProcessors;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use Madridianfox\LaravelPrometheus\LabelProvider;
 
 class HttpRequestLabelProvider implements LabelProvider
@@ -16,10 +17,7 @@ class HttpRequestLabelProvider implements LabelProvider
     {
         /** @var Request $request */
         $request = request();
-
-        $rawPath = $request->path();
-        // todo доработать замену параметров на плейсхолдеры
-        $path = preg_replace('#/\d+#', '/ID', $rawPath);
+        $path = Route::current()?->uri;
         return [
             $request->method() . ' ' . $path,
         ];

@@ -2,7 +2,6 @@
 
 namespace Madridianfox\LaravelMetrics;
 
-
 use Madridianfox\LaravelPrometheus\MetricsBag;
 
 class LatencyProfiler
@@ -68,9 +67,28 @@ class LatencyProfiler
         $this->flushData();
     }
 
-    private function overallIntervalsDuration(mixed $intervals): float
+    private function overallIntervalsDuration(array $intervals): float
     {
-        // todo
-        return 0;
+        usort($intervals, function (array $a, array $b) {
+            return $a[0] <=> $b[0];
+        });
+
+        $stack = [
+            array_shift($intervals),
+        ];
+
+        foreach ($intervals as $nextInterval) {
+            $currentInterval = end($stack);
+            if ($currentInterval[0] <= $nextInterval[0] && $nextInterval[0] <= $currentInterval[1]) {
+                $currentIntervalIndex = count($stack) - 1;
+                $stack[$currentIntervalIndex][1] = max($currentInterval[1], $nextInterval[1]);
+            } else {
+                $stack[] = $nextInterval;
+            }
+        }
+
+        return array_reduce($stack, function ($sum, $interval) {
+            return $sum + ($interval[1] - $interval[0]);
+        }, 0);
     }
 }

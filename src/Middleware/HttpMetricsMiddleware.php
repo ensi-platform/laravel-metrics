@@ -3,6 +3,7 @@
 namespace Madridianfox\LaravelMetrics\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Madridianfox\LaravelMetrics\LatencyProfiler;
 use Madridianfox\LaravelPrometheus\PrometheusManager;
@@ -15,6 +16,11 @@ class HttpMetricsMiddleware
     ) {
     }
 
+    /**
+     * @param Request $request
+     * @param Closure $next
+     * @return Response
+     */
     public function handle($request, Closure $next)
     {
         $this->prometheus->setCurrentContext('web');
@@ -26,12 +32,14 @@ class HttpMetricsMiddleware
 
         $metricsBag = $this->prometheus->defaultBag('web');
 
-        $metricsBag->updateCounter('http_request', [
+        $metricsBag->updateCounter('http_requests_total', [
             $response->status(),
         ]);
 
-        $this->latencyProfiler->addTotalTime($endTime - $startTime);
-        $this->latencyProfiler->writeMetrics($metricsBag, 'http_request_seconds', [
+        $duration = $endTime - $startTime;
+
+        $this->latencyProfiler->addTotalTime($duration);
+        $this->latencyProfiler->writeMetrics($metricsBag, 'http_request_duration_seconds', [
             $response->status(),
         ]);
 
