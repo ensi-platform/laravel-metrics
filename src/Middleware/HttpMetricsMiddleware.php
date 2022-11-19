@@ -6,12 +6,11 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Madridianfox\LaravelMetrics\LatencyProfiler;
-use Madridianfox\LaravelPrometheus\PrometheusManager;
+use Madridianfox\LaravelPrometheus\Prometheus;
 
 class HttpMetricsMiddleware
 {
     public function __construct(
-        private readonly PrometheusManager $prometheus,
         private readonly LatencyProfiler $latencyProfiler
     ) {
     }
@@ -23,14 +22,14 @@ class HttpMetricsMiddleware
      */
     public function handle($request, Closure $next)
     {
-        $this->prometheus->setCurrentContext('web');
+        Prometheus::setCurrentContext('web');
 
         $startTime = microtime(true);
         /** @var Response $response */
         $response = $next($request);
         $endTime = microtime(true);
 
-        $metricsBag = $this->prometheus->defaultBag('web');
+        $metricsBag = Prometheus::defaultBag('web');
 
         $metricsBag->updateCounter('http_requests_total', [
             $response->status(),

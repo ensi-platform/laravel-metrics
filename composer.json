@@ -7,7 +7,7 @@
             "Madridianfox\\LaravelMetrics\\": "src/"
         }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "extra": {
         "laravel": {
             "providers": [
@@ -17,11 +17,17 @@
     },
     "require": {
         "php": ">=8.1",
-        "psr/http-message": "1.0.x-dev",
-        "guzzlehttp/guzzle": "7.5.x-dev",
-        "madridianfox/laravel-prometheus": "dev-master|dev-main"
+        "psr/http-message": "^1.0",
+        "guzzlehttp/guzzle": "^7.0",
+        "madridianfox/laravel-prometheus": "dev-main"
     },
     "require-dev": {
-        "laravel/framework": "^9"
+        "laravel/framework": "^9",
+        "franzl/studio": "^0.16.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "franzl/studio": true
+        }
     }
 }
