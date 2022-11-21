@@ -6,7 +6,7 @@ use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
-use Madridianfox\LaravelMetrics\LabelProcessors\HttpRequestLabelProvider;
+use Madridianfox\LaravelMetrics\LabelMiddlewares\HttpRequestLabelMiddleware;
 use Madridianfox\LaravelPrometheus\Prometheus;
 
 class MetricsServiceProvider extends ServiceProvider
@@ -25,9 +25,9 @@ class MetricsServiceProvider extends ServiceProvider
 
     private function registerMetrics()
     {
-        $metricsBag = Prometheus::defaultBag('web');
+        $metricsBag = Prometheus::bag();
 
-        $metricsBag->addLabelProcessor(HttpRequestLabelProvider::class);
+        $metricsBag->addLabelMiddleware(HttpRequestLabelMiddleware::class);
         $metricsBag->declareCounter('log_messages_count', ['level']);
 
         resolve(LatencyProfiler::class)->registerMetrics($metricsBag);

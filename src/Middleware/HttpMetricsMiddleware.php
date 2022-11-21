@@ -22,17 +22,13 @@ class HttpMetricsMiddleware
      */
     public function handle($request, Closure $next)
     {
-        Prometheus::setCurrentContext('web');
-
         $startTime = microtime(true);
         /** @var Response $response */
         $response = $next($request);
         $endTime = microtime(true);
 
-        $metricsBag = Prometheus::defaultBag('web');
-
         $duration = $endTime - $startTime;
-        $this->latencyProfiler->writeMetrics($metricsBag, $response->status(), $duration);
+        $this->latencyProfiler->writeMetrics(Prometheus::bag(), $response->status(), $duration);
 
         return $response ;
     }
