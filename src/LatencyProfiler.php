@@ -2,13 +2,28 @@
 
 namespace Madridianfox\LaravelMetrics;
 
+use Illuminate\Support\Facades\Route;
+use Madridianfox\LaravelMetrics\StatsGroups\StatsGroup;
 use Madridianfox\LaravelPrometheus\MetricsBag;
 
 class LatencyProfiler
 {
     private array $timeQuants = [];
     private array $asyncTimeQuants = [];
-    private float $totalTime = 0;
+    /** @var array<StatsGroup> */
+    private array $statsGroups = [];
+
+    public function registerMetrics(MetricsBag $metricsBag): void
+    {
+        $metricsBag->declareCounter('http_requests_total', ['code']);
+        $metricsBag->declareCounter('http_request_duration_seconds', ['code', 'type']);
+
+        foreach (config('metrics.http_requests_stats_groups') as $groupName => $options) {
+            $statsGroup = StatsGroup::createByType($groupName, $options);
+            $statsGroup->registerMetrics($metricsBag);
+            $this->statsGroups[] = $statsGroup;
+        }
+    }
 
     public function addTimeQuant(string $type, float $duration): void
     {
@@ -24,45 +39,40 @@ class LatencyProfiler
         $this->asyncTimeQuants[$type][] = [$startMicrotime, $endMicrotime];
     }
 
-    public function addTotalTime(float $totalTime): void
-    {
-        $this->totalTime = $totalTime;
-    }
-
-    public function profile(string $type, \Closure $fn): mixed
-    {
-        $startTime = microtime(true);
-        $result = $fn();
-        $endTime = microtime(true);
-        $this->addTimeQuant($type, $endTime - $startTime);
-
-        return $result;
-    }
-
     public function flushData(): void
     {
         $this->timeQuants = [];
         $this->asyncTimeQuants = [];
-        $this->totalTime = 0;
     }
 
-    public function writeMetrics(MetricsBag $prometheus, string $name, array $labels = []): void
+    public function writeMetrics(MetricsBag $metricsBag, int $responseCode, float $totalTime): void
     {
+        if (Route::current()?->named(config('metrics.ignore_routes'))) {
+            return;
+        }
+
+        $labels = [$responseCode];
         $excludedDuration = 0;
 
         foreach ($this->timeQuants as $type => $duration) {
-            $prometheus->updateCounter($name, array_merge($labels, [$type]), $duration);
+            $metricsBag->updateCounter('http_request_duration_seconds', array_merge($labels, [$type]), $duration);
             $excludedDuration += $duration;
         }
 
         foreach ($this->asyncTimeQuants as $type => $intervals) {
             $duration = $this->overallIntervalsDuration($intervals);
-            $prometheus->updateCounter($name, array_merge($labels, [$type]), $duration);
+            $metricsBag->updateCounter('http_request_duration_seconds', array_merge($labels, [$type]), $duration);
             $excludedDuration += $duration;
         }
 
-        $appDuration = $this->totalTime - $excludedDuration;
-        $prometheus->updateCounter($name, array_merge($labels, ['php']), $appDuration);
+        $appDuration = $totalTime - $excludedDuration;
+        $metricsBag->updateCounter('http_request_duration_seconds', array_merge($labels, ['php']), $appDuration);
+
+        $metricsBag->updateCounter('http_requests_total', $labels);
+
+        foreach ($this->statsGroups as $statsGroup) {
+            $statsGroup->checkAndUpdateMetric($metricsBag, $totalTime);
+        }
 
         $this->flushData();
     }

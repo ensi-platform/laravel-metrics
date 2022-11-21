@@ -31,16 +31,8 @@ class HttpMetricsMiddleware
 
         $metricsBag = Prometheus::defaultBag('web');
 
-        $metricsBag->updateCounter('http_requests_total', [
-            $response->status(),
-        ]);
-
         $duration = $endTime - $startTime;
-
-        $this->latencyProfiler->addTotalTime($duration);
-        $this->latencyProfiler->writeMetrics($metricsBag, 'http_request_duration_seconds', [
-            $response->status(),
-        ]);
+        $this->latencyProfiler->writeMetrics($metricsBag, $response->status(), $duration);
 
         return $response ;
     }

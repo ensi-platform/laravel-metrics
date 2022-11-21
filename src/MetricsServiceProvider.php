@@ -8,13 +8,13 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Madridianfox\LaravelMetrics\LabelProcessors\HttpRequestLabelProvider;
 use Madridianfox\LaravelPrometheus\Prometheus;
-use Madridianfox\LaravelPrometheus\PrometheusManager;
 
 class MetricsServiceProvider extends ServiceProvider
 {
     public function register()
     {
         $this->app->singleton(LatencyProfiler::class);
+        $this->mergeConfigFrom(__DIR__.'/../config/metrics.php', 'metrics');
     }
 
     public function boot()
@@ -25,16 +25,12 @@ class MetricsServiceProvider extends ServiceProvider
 
     private function registerMetrics()
     {
-        /** @var PrometheusManager $prometheus */
-        $prometheus = resolve(PrometheusManager::class);
-        $metricsBag = $prometheus->defaultBag('web');
+        $metricsBag = Prometheus::defaultBag('web');
 
         $metricsBag->addLabelProcessor(HttpRequestLabelProvider::class);
-
-        $metricsBag->declareCounter('http_requests_total', ['code']);
-        $metricsBag->declareCounter('http_request_duration_seconds', ['code', 'type']);
-
         $metricsBag->declareCounter('log_messages_count', ['level']);
+
+        resolve(LatencyProfiler::class)->registerMetrics($metricsBag);
     }
 
     private function registerEventListeners()
