@@ -7,6 +7,11 @@
             "Madridianfox\\LaravelMetrics\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Madridianfox\\LaravelMetrics\\Tests\\": "tests/"
+        }
+    },
     "minimum-stability": "stable",
     "extra": {
         "laravel": {
@@ -22,8 +27,8 @@
         "madridianfox/laravel-prometheus": "dev-main"
     },
     "require-dev": {
-        "laravel/framework": "^9",
-        "franzl/studio": "^0.16.0"
+        "franzl/studio": "^0.16.0",
+        "orchestra/testbench": "^7.0"
     },
     "config": {
         "allow-plugins": {

@@ -13,15 +13,20 @@ class LatencyProfiler
     /** @var array<StatsGroup> */
     private array $statsGroups = [];
 
+    public function __construct()
+    {
+        foreach (config('metrics.http_requests_stats_groups') as $groupName => $options) {
+            $this->statsGroups[] = StatsGroup::createByType($groupName, $options);
+        }
+    }
+
     public function registerMetrics(MetricsBag $metricsBag): void
     {
         $metricsBag->declareCounter('http_requests_total', ['code']);
         $metricsBag->declareCounter('http_request_duration_seconds', ['code', 'type']);
 
-        foreach (config('metrics.http_requests_stats_groups') as $groupName => $options) {
-            $statsGroup = StatsGroup::createByType($groupName, $options);
+        foreach ($this->statsGroups as $statsGroup) {
             $statsGroup->registerMetrics($metricsBag);
-            $this->statsGroups[] = $statsGroup;
         }
     }
 
@@ -69,6 +74,7 @@ class LatencyProfiler
         $metricsBag->updateCounter('http_request_duration_seconds', array_merge($labels, ['php']), $appDuration);
 
         $metricsBag->updateCounter('http_requests_total', $labels);
+
 
         foreach ($this->statsGroups as $statsGroup) {
             $statsGroup->checkAndUpdateMetric($metricsBag, $totalTime);

@@ -2,3 +2,4 @@
 vendor
 composer.lock
 studio.json
+.phpunit.cache
