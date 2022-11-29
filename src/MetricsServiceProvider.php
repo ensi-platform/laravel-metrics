@@ -19,6 +19,12 @@ class MetricsServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__.'/../config/metrics.php' => config_path('metrics.php'),
+            ], 'metrics-config');
+        }
+
         $this->registerMetrics();
         $this->registerEventListeners();
     }
@@ -27,8 +33,9 @@ class MetricsServiceProvider extends ServiceProvider
     {
         $metricsBag = Prometheus::bag();
 
-        $metricsBag->addLabelMiddleware(HttpRequestLabelMiddleware::class);
-        $metricsBag->declareCounter('log_messages_count', ['level']);
+        $metricsBag->counter('log_messages_count')
+            ->middleware(HttpRequestLabelMiddleware::class)
+            ->labels(['level']);
 
         resolve(LatencyProfiler::class)->registerMetrics($metricsBag);
     }
@@ -42,7 +49,7 @@ class MetricsServiceProvider extends ServiceProvider
         });
 
         Event::listen(MessageLogged::class, function (MessageLogged $event) {
-            Prometheus::updateCounter('log_messages_count', [$event->level]);
+            Prometheus::update('log_messages_count', 1, [$event->level]);
         });
     }
 }

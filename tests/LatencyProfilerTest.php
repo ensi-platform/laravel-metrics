@@ -5,6 +5,7 @@ namespace Madridianfox\LaravelMetrics\Tests;
 use Illuminate\Routing\Route as CurrentRoute;
 use Illuminate\Support\Facades\Route;
 use Madridianfox\LaravelMetrics\LatencyProfiler;
+use Madridianfox\LaravelPrometheus\Metrics\Counter;
 use Madridianfox\LaravelPrometheus\MetricsBag;
 use Mockery\MockInterface;
 
@@ -12,11 +13,27 @@ class LatencyProfilerTest extends TestCase
 {
     private function assertDefaultMetricsRegistered(MetricsBag|MockInterface $metricsBag): void
     {
-        $metricsBag->expects('declareCounter')
-            ->withArgs(['http_requests_total', ['code']]);
+        $counter1 = tap($this->mock(Counter::class), function (MockInterface $counter) {
+            $counter->shouldReceive('labels')
+                ->withArgs([['code']])
+                ->andReturnSelf();
+            $counter->shouldReceive('middleware')
+                ->andReturnSelf();
+        });
+        $metricsBag->expects('counter')
+            ->withArgs(['http_requests_total'])
+            ->andReturn($counter1);
 
-        $metricsBag->expects('declareCounter')
-            ->withArgs(['http_request_duration_seconds', ['code', 'type']]);
+        $counter2 = tap($this->mock(Counter::class), function (MockInterface $counter) {
+            $counter->shouldReceive('labels')
+                ->withArgs([['code', 'type']])
+                ->andReturnSelf();
+            $counter->shouldReceive('middleware')
+                ->andReturnSelf();
+        });
+        $metricsBag->expects('counter')
+            ->withArgs(['http_request_duration_seconds'])
+            ->andReturn($counter2);
     }
 
     public function testRegisterMetricsWithoutStats(): void
@@ -55,10 +72,10 @@ class LatencyProfilerTest extends TestCase
         $metricsBag = $this->mock(MetricsBag::class);
         $this->assertDefaultMetricsRegistered($metricsBag);
 
-        $metricsBag->expects('declareSummary')
+        $metricsBag->expects('summary')
             ->withArgs(['http_stats_s', 60, [0.5, 0.95]]);
 
-        $metricsBag->expects('declareHistogram')
+        $metricsBag->expects('histogram')
             ->withArgs(['http_stats_h', [0.01, 0.02, 0.04, 0.08, 0.16]]);
 
         $latencyProfiler = new LatencyProfiler();
@@ -72,11 +89,11 @@ class LatencyProfilerTest extends TestCase
         /** @var MetricsBag|MockInterface $metricsBag */
         $metricsBag = $this->mock(MetricsBag::class);
 
-        $metricsBag->expects('updateCounter')
-            ->withArgs(['http_request_duration_seconds', [200, 'php'], 0.55]);
+        $metricsBag->expects('update')
+            ->withArgs(['http_request_duration_seconds', 0.55, [200, 'php']]);
 
-        $metricsBag->expects('updateCounter')
-            ->withArgs(['http_requests_total', [200]]);
+        $metricsBag->expects('update')
+            ->withArgs(['http_requests_total', 1, [200]]);
 
         $latencyProfiler->writeMetrics($metricsBag, 200, 0.55);
     }
@@ -101,17 +118,17 @@ class LatencyProfilerTest extends TestCase
 
 
         $metricsBag
-            ->shouldReceive('updateCounter')
+            ->shouldReceive('update')
             ->once()
-            ->with('http_request_duration_seconds', [200, 'db'], $spansTime)
+            ->with('http_request_duration_seconds', $spansTime, [200, 'db'])
 
-            ->shouldReceive('updateCounter')
+            ->shouldReceive('update')
             ->once()
-            ->with('http_request_duration_seconds', [200, 'php'], $appTime)
+            ->with('http_request_duration_seconds', $appTime, [200, 'php'])
 
-            ->shouldReceive('updateCounter')
+            ->shouldReceive('update')
             ->once()
-            ->with('http_requests_total', [200]);
+            ->with('http_requests_total', 1, [200]);
 
         foreach ($syncSpans as $syncSpanTime) {
             $latencyProfiler->addTimeQuant('db', $syncSpanTime);
@@ -141,17 +158,17 @@ class LatencyProfilerTest extends TestCase
         $metricsBag = $this->mock(MetricsBag::class);
 
         $metricsBag
-            ->shouldReceive('updateCounter')
+            ->shouldReceive('update')
             ->once()
-            ->with('http_request_duration_seconds', [200, 'http_client'], $spansTime)
+            ->with('http_request_duration_seconds', $spansTime, [200, 'http_client'])
 
-            ->shouldReceive('updateCounter')
+            ->shouldReceive('update')
             ->once()
-            ->with('http_request_duration_seconds', [200, 'php'], $appTime)
+            ->with('http_request_duration_seconds', $appTime, [200, 'php'])
 
-            ->shouldReceive('updateCounter')
+            ->shouldReceive('update')
             ->once()
-            ->with('http_requests_total', [200]);
+            ->with('http_requests_total', 1, [200]);
 
         foreach ($spans as [$spanStart, $spanEnd]) {
             $latencyProfiler->addAsyncTimeQuant('http_client', $spanStart, $spanEnd);
@@ -199,21 +216,21 @@ class LatencyProfilerTest extends TestCase
         $metricsBag = $this->mock(MetricsBag::class);
 
         $metricsBag
-            ->shouldReceive('updateCounter')
+            ->shouldReceive('update')
             ->once()
-            ->with('http_request_duration_seconds', [200, 'php'], 5)
+            ->with('http_request_duration_seconds', 5, [200, 'php'])
 
-            ->shouldReceive('updateCounter')
+            ->shouldReceive('update')
             ->once()
-            ->with('http_requests_total', [200])
+            ->with('http_requests_total', 1, [200])
 
-            ->shouldReceive('updateSummary')
+            ->shouldReceive('update')
             ->once()
-            ->with('http_stats_s', [], 5)
+            ->with('http_stats_s', 5)
 
-            ->shouldReceive('updateHistogram')
+            ->shouldReceive('update')
             ->once()
-            ->with('http_stats_h', [], 5);
+            ->with('http_stats_h', 5);
 
         $this->mockCurrentRouteChecks([false, true, true, false]);
 

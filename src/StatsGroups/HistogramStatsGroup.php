@@ -8,11 +8,11 @@ class HistogramStatsGroup extends StatsGroup
 {
     public function registerMetrics(MetricsBag $metricsBag): void
     {
-        $metricsBag->declareHistogram($this->groupMetricName($this->name), $this->options['buckets']);
+        $metricsBag->histogram($this->groupMetricName($this->name), $this->options['buckets']);
     }
 
     protected function updateMetrics(MetricsBag $metricsBag, float $totalTime): void
     {
-        $metricsBag->updateHistogram($this->groupMetricName($this->name), [], $totalTime);
+        $metricsBag->update($this->groupMetricName($this->name), $totalTime);
     }
 }

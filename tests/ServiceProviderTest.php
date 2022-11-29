@@ -7,6 +7,7 @@ use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Support\Facades\Event;
 use Madridianfox\LaravelMetrics\LatencyProfiler;
 use Madridianfox\LaravelMetrics\MetricsServiceProvider;
+use Madridianfox\LaravelPrometheus\Metrics\Counter;
 use Madridianfox\LaravelPrometheus\MetricsBag;
 use Madridianfox\LaravelPrometheus\Prometheus;
 use Mockery;
@@ -26,10 +27,18 @@ class ServiceProviderTest extends TestCase
         $latencyProfiler->expects('registerMetrics');
         app()->instance(LatencyProfiler::class, $latencyProfiler);
 
+        $counter = tap($this->mock(Counter::class), function (MockInterface $counter) {
+            $counter->shouldReceive('labels')
+                ->withArgs([['level']])
+                ->andReturnSelf();
+            $counter->shouldReceive('middleware')
+                ->andReturnSelf();
+        });
+
         /** @var MetricsBag|MockInterface $metricsBag */
         $metricsBag = $this->mock(MetricsBag::class);
-        $metricsBag->expects('addLabelMiddleware');
-        $metricsBag->expects('declareCounter');
+        $metricsBag->expects('counter')
+            ->andReturn($counter);
 
         Prometheus::expects('bag')
             ->andReturn($metricsBag);

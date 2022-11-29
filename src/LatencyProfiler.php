@@ -3,6 +3,7 @@
 namespace Madridianfox\LaravelMetrics;
 
 use Illuminate\Support\Facades\Route;
+use Madridianfox\LaravelMetrics\LabelMiddlewares\HttpRequestLabelMiddleware;
 use Madridianfox\LaravelMetrics\StatsGroups\StatsGroup;
 use Madridianfox\LaravelPrometheus\MetricsBag;
 
@@ -22,8 +23,12 @@ class LatencyProfiler
 
     public function registerMetrics(MetricsBag $metricsBag): void
     {
-        $metricsBag->declareCounter('http_requests_total', ['code']);
-        $metricsBag->declareCounter('http_request_duration_seconds', ['code', 'type']);
+        $metricsBag->counter('http_requests_total')
+            ->middleware(HttpRequestLabelMiddleware::class)
+            ->labels(['code']);
+        $metricsBag->counter('http_request_duration_seconds')
+            ->middleware(HttpRequestLabelMiddleware::class)
+            ->labels(['code', 'type']);
 
         foreach ($this->statsGroups as $statsGroup) {
             $statsGroup->registerMetrics($metricsBag);
@@ -60,20 +65,20 @@ class LatencyProfiler
         $excludedDuration = 0;
 
         foreach ($this->timeQuants as $type => $duration) {
-            $metricsBag->updateCounter('http_request_duration_seconds', array_merge($labels, [$type]), $duration);
+            $metricsBag->update('http_request_duration_seconds', $duration, array_merge($labels, [$type]));
             $excludedDuration += $duration;
         }
 
         foreach ($this->asyncTimeQuants as $type => $intervals) {
             $duration = $this->overallIntervalsDuration($intervals);
-            $metricsBag->updateCounter('http_request_duration_seconds', array_merge($labels, [$type]), $duration);
+            $metricsBag->update('http_request_duration_seconds', $duration, array_merge($labels, [$type]));
             $excludedDuration += $duration;
         }
 
         $appDuration = $totalTime - $excludedDuration;
-        $metricsBag->updateCounter('http_request_duration_seconds', array_merge($labels, ['php']), $appDuration);
+        $metricsBag->update('http_request_duration_seconds', $appDuration, array_merge($labels, ['php']));
 
-        $metricsBag->updateCounter('http_requests_total', $labels);
+        $metricsBag->update('http_requests_total', 1, $labels);
 
 
         foreach ($this->statsGroups as $statsGroup) {
