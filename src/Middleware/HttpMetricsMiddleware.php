@@ -30,6 +30,6 @@ class HttpMetricsMiddleware
         $duration = $endTime - $startTime;
         $this->latencyProfiler->writeMetrics(Prometheus::bag(), $response->status(), $duration);
 
-        return $response ;
+        return $response;
     }
 }
