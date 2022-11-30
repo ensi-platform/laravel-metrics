@@ -37,16 +37,15 @@ $response1 = $client->get('http://httpbin.org/get');
 
 ## Usage
 
-Пакет добавляет в дефолтный Metrics Bag свой Label Middleware - HttpRequestLabelMiddleware,
-который добавляет во все метрики лейбл endpoint содержащий шаблон текущего роута.
-
 Метрики:
-| Name | Type | Labels | Description |
-| ---- | ---- | ------ | ----------- |
-| http_requests_total | Counter | code, endpoint ||
-| http_request_duration_seconds | Counter| code, type, endpoint ||
-| http_stats_<name> | histogram or summery | 
+
+| Name                          | Type | Labels               | Description |
+|-------------------------------| ---- |----------------------| ----------- |
+| http_requests_total           | Counter | code, endpoint       | Счётчик входящих http запросов |
+| http_request_duration_seconds | Counter| code, type, endpoint | Счётчик времени обработки входящих http запросов |
+| http_stats_\<name\>           | Histogram or Summary |                      | Статистика по времени обработки запросов для указанной в конфиге группы эндпоинтов |
+| log_messages_count            | Counter | level, endpoint      | Количество сообщений в логе |
 
 
 ## License
-Laravel Prometheus is open-sourced software licensed under the [MIT license](LICENSE.md).
+Laravel Metrics is open-sourced software licensed under the [MIT license](LICENSE.md).
