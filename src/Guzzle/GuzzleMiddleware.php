@@ -1,11 +1,12 @@
 <?php
 
-namespace Madridianfox\LaravelMetrics\Middleware;
+namespace Madridianfox\LaravelMetrics\Guzzle;
 
-use Madridianfox\LaravelMetrics\LatencyProfiler;
-use Psr\Http\Message\RequestInterface;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Promise\RejectedPromise;
+use Madridianfox\LaravelMetrics\LatencyProfiler;
+use Psr\Http\Message\RequestInterface;
+use function resolve;
 
 class GuzzleMiddleware
 {

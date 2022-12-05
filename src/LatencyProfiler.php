@@ -3,7 +3,7 @@
 namespace Madridianfox\LaravelMetrics;
 
 use Illuminate\Support\Facades\Route;
-use Madridianfox\LaravelMetrics\LabelMiddlewares\HttpRequestLabelMiddleware;
+use Madridianfox\LaravelMetrics\Labels\HttpRequestLabels;
 use Madridianfox\LaravelMetrics\StatsGroups\StatsGroup;
 use Madridianfox\LaravelPrometheus\MetricsBag;
 
@@ -24,10 +24,10 @@ class LatencyProfiler
     public function registerMetrics(MetricsBag $metricsBag): void
     {
         $metricsBag->counter('http_requests_total')
-            ->middleware(HttpRequestLabelMiddleware::class)
+            ->middleware(HttpRequestLabels::class)
             ->labels(['code']);
         $metricsBag->counter('http_request_duration_seconds')
-            ->middleware(HttpRequestLabelMiddleware::class)
+            ->middleware(HttpRequestLabels::class)
             ->labels(['code', 'type']);
 
         foreach ($this->statsGroups as $statsGroup) {

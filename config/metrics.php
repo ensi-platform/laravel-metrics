@@ -11,10 +11,8 @@ return [
             'time_window' => 60,
             'quantiles' => [0.5, 0.95],
         ],
-        // 'default' => [
-        //     'type' => 'histogram',
-        //     'route_names' => ['*'],
-        //     'buckets' => [0.01, 0.02, 0.04, 0.08, 0.16],
-        // ],
+    ],
+    'watch_queues' => [
+        'default',
     ]
 ];

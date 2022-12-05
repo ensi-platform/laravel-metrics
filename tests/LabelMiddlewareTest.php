@@ -4,7 +4,7 @@ namespace Madridianfox\LaravelMetrics\Tests;
 
 
 use Illuminate\Support\Facades\Route;
-use Madridianfox\LaravelMetrics\LabelMiddlewares\HttpRequestLabelMiddleware;
+use Madridianfox\LaravelMetrics\Labels\HttpRequestLabels;
 
 class LabelMiddlewareTest extends TestCase
 {
@@ -14,7 +14,7 @@ class LabelMiddlewareTest extends TestCase
             ->once()
             ->andReturn(tap(new \stdClass(), fn($route) => $route->uri = "api/login"));
 
-        $labelMiddleware = new HttpRequestLabelMiddleware();
+        $labelMiddleware = new HttpRequestLabels();
 
         $this->assertEquals(['endpoint'], $labelMiddleware->labels());
         $this->assertEquals(['GET api/login'], $labelMiddleware->values());

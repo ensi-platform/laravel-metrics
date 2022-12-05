@@ -16,12 +16,13 @@ php artisan vendor:publish --tag=metrics-config
 ```
 
 Добавьте Http Middleware
+
 ```php
 # app/Http/Kernel.php
 
 protected $middleware = [
     // ... other middlewares
-    \Madridianfox\LaravelMetrics\Middleware\HttpMetricsMiddleware::class,
+    \Madridianfox\LaravelMetrics\HttpMiddleware\HttpMetricsMiddleware::class,
 ];
 ```
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Madridianfox\LaravelMetrics\Middleware;
+namespace Madridianfox\LaravelMetrics\HttpMiddleware;
 
 use Closure;
 use Illuminate\Http\Request;

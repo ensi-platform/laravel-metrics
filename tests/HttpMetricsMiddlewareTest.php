@@ -5,7 +5,7 @@ namespace Madridianfox\LaravelMetrics\Tests;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Madridianfox\LaravelMetrics\LatencyProfiler;
-use Madridianfox\LaravelMetrics\Middleware\HttpMetricsMiddleware;
+use Madridianfox\LaravelMetrics\HttpMiddleware\HttpMetricsMiddleware;
 use Mockery\MockInterface;
 
 class HttpMetricsMiddlewareTest extends TestCase
