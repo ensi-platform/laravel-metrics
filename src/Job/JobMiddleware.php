@@ -1,8 +1,8 @@
 <?php
 
-namespace Madridianfox\LaravelMetrics\Job;
+namespace Ensi\LaravelMetrics\Job;
 
-use Madridianfox\LaravelPrometheus\Prometheus;
+use Ensi\LaravelPrometheus\Prometheus;
 
 class JobMiddleware
 {

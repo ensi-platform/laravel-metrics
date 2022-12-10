@@ -1,9 +1,9 @@
 <?php
 
-namespace Madridianfox\LaravelMetrics\StatsGroups;
+namespace Ensi\LaravelMetrics\StatsGroups;
 
 use Illuminate\Support\Facades\Route;
-use Madridianfox\LaravelPrometheus\MetricsBag;
+use Ensi\LaravelPrometheus\MetricsBag;
 
 abstract class StatsGroup
 {

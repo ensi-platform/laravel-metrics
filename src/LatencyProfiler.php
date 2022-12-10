@@ -1,11 +1,11 @@
 <?php
 
-namespace Madridianfox\LaravelMetrics;
+namespace Ensi\LaravelMetrics;
 
 use Illuminate\Support\Facades\Route;
-use Madridianfox\LaravelMetrics\Labels\HttpRequestLabels;
-use Madridianfox\LaravelMetrics\StatsGroups\StatsGroup;
-use Madridianfox\LaravelPrometheus\MetricsBag;
+use Ensi\LaravelMetrics\Labels\HttpRequestLabels;
+use Ensi\LaravelMetrics\StatsGroups\StatsGroup;
+use Ensi\LaravelPrometheus\MetricsBag;
 
 class LatencyProfiler
 {

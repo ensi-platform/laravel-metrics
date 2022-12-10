@@ -1,15 +1,17 @@
 <?php
 
-namespace Madridianfox\LaravelMetrics\Tests;
+namespace Ensi\LaravelMetrics\Tests;
 
+use Illuminate\Console\Events\ScheduledTaskFinished;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Log\Events\MessageLogged;
+use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
-use Madridianfox\LaravelMetrics\LatencyProfiler;
-use Madridianfox\LaravelMetrics\MetricsServiceProvider;
-use Madridianfox\LaravelPrometheus\Metrics\Counter;
-use Madridianfox\LaravelPrometheus\MetricsBag;
-use Madridianfox\LaravelPrometheus\Prometheus;
+use Ensi\LaravelMetrics\LatencyProfiler;
+use Ensi\LaravelMetrics\MetricsServiceProvider;
+use Ensi\LaravelPrometheus\Metrics\Counter;
+use Ensi\LaravelPrometheus\MetricsBag;
+use Ensi\LaravelPrometheus\Prometheus;
 use Mockery;
 use Mockery\MockInterface;
 
@@ -27,21 +29,16 @@ class ServiceProviderTest extends TestCase
         $latencyProfiler->expects('registerMetrics');
         app()->instance(LatencyProfiler::class, $latencyProfiler);
 
-        $counter = tap($this->mock(Counter::class), function (MockInterface $counter) {
-            $counter->shouldReceive('labels')
-                ->withArgs([['level']])
-                ->andReturnSelf();
-            $counter->shouldReceive('middleware')
-                ->andReturnSelf();
-        });
-
         /** @var MetricsBag|MockInterface $metricsBag */
         $metricsBag = $this->mock(MetricsBag::class);
         $metricsBag->expects('counter')
-            ->andReturn($counter);
+            ->times(7)
+            ->andReturnUsing(fn () => new Counter($metricsBag, 'n'));
 
         Prometheus::expects('bag')
             ->andReturn($metricsBag);
+
+        Prometheus::expects('addOnDemandMetric');
 
         $serviceProvider = new MetricsServiceProvider($this->app);
         $serviceProvider->boot();
@@ -54,6 +51,12 @@ class ServiceProviderTest extends TestCase
 
         Event::expects('listen')
             ->withArgs([MessageLogged::class, Mockery::any()]);
+
+        Event::expects('listen')
+            ->withArgs([JobFailed::class, Mockery::any()]);
+
+        Event::expects('listen')
+            ->withArgs([ScheduledTaskFinished::class, Mockery::any()]);
 
         $serviceProvider = new MetricsServiceProvider($this->app);
         $serviceProvider->boot();

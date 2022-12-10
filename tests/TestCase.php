@@ -1,14 +1,14 @@
 <?php
 
-namespace Madridianfox\LaravelMetrics\Tests;
+namespace Ensi\LaravelMetrics\Tests;
 
 class TestCase extends \Orchestra\Testbench\TestCase
 {
     protected function getPackageProviders($app)
     {
         return [
-            \Madridianfox\LaravelPrometheus\PrometheusServiceProvider::class,
-            \Madridianfox\LaravelMetrics\MetricsServiceProvider::class,
+            \Ensi\LaravelPrometheus\PrometheusServiceProvider::class,
+            \Ensi\LaravelMetrics\MetricsServiceProvider::class,
         ];
     }
 }

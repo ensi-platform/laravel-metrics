@@ -1,14 +1,14 @@
 <?php
 
-namespace Madridianfox\LaravelMetrics\Tests;
+namespace Ensi\LaravelMetrics\Tests;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
-use Madridianfox\LaravelMetrics\LatencyProfiler;
-use Madridianfox\LaravelPrometheus\Prometheus;
-use Madridianfox\LaravelPrometheus\PrometheusManager;
+use Ensi\LaravelMetrics\LatencyProfiler;
+use Ensi\LaravelPrometheus\Prometheus;
+use Ensi\LaravelPrometheus\PrometheusManager;
 use Mockery\MockInterface;
 
 class EventListenersTest extends TestCase

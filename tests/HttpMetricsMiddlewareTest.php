@@ -1,11 +1,11 @@
 <?php
 
-namespace Madridianfox\LaravelMetrics\Tests;
+namespace Ensi\LaravelMetrics\Tests;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Madridianfox\LaravelMetrics\LatencyProfiler;
-use Madridianfox\LaravelMetrics\HttpMiddleware\HttpMetricsMiddleware;
+use Ensi\LaravelMetrics\LatencyProfiler;
+use Ensi\LaravelMetrics\HttpMiddleware\HttpMetricsMiddleware;
 use Mockery\MockInterface;
 
 class HttpMetricsMiddlewareTest extends TestCase

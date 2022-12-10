@@ -1,10 +1,10 @@
 <?php
 
-namespace Madridianfox\LaravelMetrics\Labels;
+namespace Ensi\LaravelMetrics\Labels;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Madridianfox\LaravelPrometheus\LabelMiddlewares\LabelMiddleware;
+use Ensi\LaravelPrometheus\LabelMiddlewares\LabelMiddleware;
 
 class HttpRequestLabels implements LabelMiddleware
 {

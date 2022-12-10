@@ -1,13 +1,13 @@
 # General prometheus metrics for laravel
 
 Пакет добавляет метрики общего назначения для веб-приложения на laravel.
-Является дополнением к [MadridianFox/laravel-prometheus](https://github.com/MadridianFox/laravel-prometheus)
+Является дополнением к [ensi/laravel-prometheus](https://github.com/ensi-platform/laravel-prometheus)
 
 ## Installation
 
 Добавьте пакет в приложение
 ```bash
-composer require madridianfox/laravel-metrics
+composer require ensi/laravel-metrics
 ```
 
 Скопируйте конфигурацию для дальнейшей настройки
@@ -22,7 +22,7 @@ php artisan vendor:publish --tag=metrics-config
 
 protected $middleware = [
     // ... other middlewares
-    \Madridianfox\LaravelMetrics\HttpMiddleware\HttpMetricsMiddleware::class,
+    \Ensi\LaravelMetrics\HttpMiddleware\HttpMetricsMiddleware::class,
 ];
 ```
 

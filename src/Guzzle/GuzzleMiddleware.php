@@ -1,10 +1,10 @@
 <?php
 
-namespace Madridianfox\LaravelMetrics\Guzzle;
+namespace Ensi\LaravelMetrics\Guzzle;
 
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Promise\RejectedPromise;
-use Madridianfox\LaravelMetrics\LatencyProfiler;
+use Ensi\LaravelMetrics\LatencyProfiler;
 use Psr\Http\Message\RequestInterface;
 use function resolve;
 

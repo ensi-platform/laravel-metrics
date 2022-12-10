@@ -1,12 +1,12 @@
 <?php
 
-namespace Madridianfox\LaravelMetrics\HttpMiddleware;
+namespace Ensi\LaravelMetrics\HttpMiddleware;
 
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Madridianfox\LaravelMetrics\LatencyProfiler;
-use Madridianfox\LaravelPrometheus\Prometheus;
+use Ensi\LaravelMetrics\LatencyProfiler;
+use Ensi\LaravelPrometheus\Prometheus;
 
 class HttpMetricsMiddleware
 {

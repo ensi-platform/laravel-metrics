@@ -1,6 +1,6 @@
 <?php
 
-namespace Madridianfox\LaravelMetrics\Task;
+namespace Ensi\LaravelMetrics\Task;
 
 use Illuminate\Console\Application;
 use Illuminate\Console\Scheduling\Event;

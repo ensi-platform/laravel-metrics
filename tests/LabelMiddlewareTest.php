@@ -1,10 +1,10 @@
 <?php
 
-namespace Madridianfox\LaravelMetrics\Tests;
+namespace Ensi\LaravelMetrics\Tests;
 
 
 use Illuminate\Support\Facades\Route;
-use Madridianfox\LaravelMetrics\Labels\HttpRequestLabels;
+use Ensi\LaravelMetrics\Labels\HttpRequestLabels;
 
 class LabelMiddlewareTest extends TestCase
 {

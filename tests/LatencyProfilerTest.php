@@ -1,12 +1,12 @@
 <?php
 
-namespace Madridianfox\LaravelMetrics\Tests;
+namespace Ensi\LaravelMetrics\Tests;
 
 use Illuminate\Routing\Route as CurrentRoute;
 use Illuminate\Support\Facades\Route;
-use Madridianfox\LaravelMetrics\LatencyProfiler;
-use Madridianfox\LaravelPrometheus\Metrics\Counter;
-use Madridianfox\LaravelPrometheus\MetricsBag;
+use Ensi\LaravelMetrics\LatencyProfiler;
+use Ensi\LaravelPrometheus\Metrics\Counter;
+use Ensi\LaravelPrometheus\MetricsBag;
 use Mockery\MockInterface;
 
 class LatencyProfilerTest extends TestCase

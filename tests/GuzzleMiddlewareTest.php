@@ -1,14 +1,14 @@
 <?php
 
-namespace Madridianfox\LaravelMetrics\Tests;
+namespace Ensi\LaravelMetrics\Tests;
 
 use Exception;
 use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Promise\RejectedPromise;
 use GuzzleHttp\Psr7\Request;
-use Madridianfox\LaravelMetrics\Guzzle\GuzzleMiddleware;
-use Madridianfox\LaravelMetrics\LatencyProfiler;
+use Ensi\LaravelMetrics\Guzzle\GuzzleMiddleware;
+use Ensi\LaravelMetrics\LatencyProfiler;
 use Mockery\MockInterface;
 
 class GuzzleMiddlewareTest extends TestCase

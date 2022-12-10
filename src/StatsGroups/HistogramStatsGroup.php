@@ -1,8 +1,8 @@
 <?php
 
-namespace Madridianfox\LaravelMetrics\StatsGroups;
+namespace Ensi\LaravelMetrics\StatsGroups;
 
-use Madridianfox\LaravelPrometheus\MetricsBag;
+use Ensi\LaravelPrometheus\MetricsBag;
 
 class HistogramStatsGroup extends StatsGroup
 {

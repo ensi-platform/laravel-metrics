@@ -1,6 +1,6 @@
 <?php
 
-namespace Madridianfox\LaravelMetrics\Job;
+namespace Ensi\LaravelMetrics\Job;
 
 use Illuminate\Bus\Queueable;
 

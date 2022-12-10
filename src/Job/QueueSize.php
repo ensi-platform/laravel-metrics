@@ -1,10 +1,10 @@
 <?php
 
-namespace Madridianfox\LaravelMetrics\Job;
+namespace Ensi\LaravelMetrics\Job;
 
 use Illuminate\Support\Facades\Queue;
-use Madridianfox\LaravelPrometheus\MetricsBag;
-use Madridianfox\LaravelPrometheus\OnDemandMetrics\OnDemandMetric;
+use Ensi\LaravelPrometheus\MetricsBag;
+use Ensi\LaravelPrometheus\OnDemandMetrics\OnDemandMetric;
 
 class QueueSize implements OnDemandMetric
 {
