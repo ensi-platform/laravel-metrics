@@ -140,6 +140,16 @@ class LatencyProfilerTest extends TestCase
     public function asyncQuantsProvider(): array
     {
         return [
+            [
+                [
+                    [1670864385.148171, 1670864385.159712],
+                    [1670864385.162446, 1670864385.439255],
+                    [1670864385.442489, 1670864385.450273],
+                ],
+                1,
+                0.29613423347473,
+                0.7038
+            ],
             [[[1, 2]], 10, 1, 9],
             [[[1, 3], [2, 4]], 10, 3, 7],
             [[[1, 3], [3, 6]], 10, 5, 5],
@@ -150,7 +160,7 @@ class LatencyProfilerTest extends TestCase
     /**
      * @dataProvider asyncQuantsProvider
      */
-    public function testAsyncTimeQuants(array $spans, int $total, int $spansTime, int $appTime): void
+    public function testAsyncTimeQuants(array $spans, float $total, float $spansTime, float $appTime): void
     {
         $latencyProfiler = new LatencyProfiler();
 
@@ -160,11 +170,19 @@ class LatencyProfilerTest extends TestCase
         $metricsBag
             ->shouldReceive('update')
             ->once()
-            ->with('http_request_duration_seconds', $spansTime, [200, 'http_client'])
+            ->withArgs(function ($name, $time, $labels) use ($spansTime) {
+                return $name == 'http_request_duration_seconds'
+                    && abs($spansTime - $time) < 0.001
+                    && $labels == [200, 'http_client'];
+            })
 
             ->shouldReceive('update')
             ->once()
-            ->with('http_request_duration_seconds', $appTime, [200, 'php'])
+            ->withArgs(function ($name, $time, $labels) use ($appTime) {
+                return $name == 'http_request_duration_seconds'
+                    && abs($appTime - $time) < 0.001
+                    && $labels == [200, 'php'];
+            })
 
             ->shouldReceive('update')
             ->once()
