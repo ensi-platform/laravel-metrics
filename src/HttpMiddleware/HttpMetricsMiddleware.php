@@ -28,7 +28,7 @@ class HttpMetricsMiddleware
         $endTime = microtime(true);
 
         $duration = $endTime - $startTime;
-        $this->latencyProfiler->writeMetrics(Prometheus::bag(), $response->status(), $duration);
+        $this->latencyProfiler->writeMetrics(Prometheus::bag(), $response->getStatusCode(), $duration);
 
         return $response;
     }
