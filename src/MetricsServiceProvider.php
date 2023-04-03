@@ -61,6 +61,9 @@ class MetricsServiceProvider extends ServiceProvider
         $metricsBag->counter('task_failed_total')
             ->labels(TaskLabels::labelNames());
 
+        $metricsBag->counter('http_client_seconds_total')
+            ->labels(['host']);
+
         resolve(LatencyProfiler::class)->registerMetrics($metricsBag);
     }
 

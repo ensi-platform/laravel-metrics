@@ -2,6 +2,7 @@
 
 namespace Ensi\LaravelMetrics\Guzzle;
 
+use Ensi\LaravelPrometheus\Prometheus;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Promise\RejectedPromise;
 use Ensi\LaravelMetrics\LatencyProfiler;
@@ -33,12 +34,20 @@ class GuzzleMiddleware
         };
     }
 
-    public static function handleResponse($start, $request)
+    /**
+     * @param $start
+     * @param RequestInterface $request
+     */
+    public static function handleResponse($start, $request): void
     {
         $end = microtime(true);
 
         /** @var LatencyProfiler $profiler */
         $profiler = resolve(LatencyProfiler::class);
         $profiler->addAsyncTimeQuant('http_client', $start, $end);
+
+        Prometheus::update('http_client_seconds_total', $end - $start, [
+            'host' => $request->getHeaderLine('host')
+        ]);
     }
 }
