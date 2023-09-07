@@ -41,6 +41,9 @@ $response1 = $client->get('http://httpbin.org/get');
 Структура файла конфигурации
 ```php
 return [
+    'ignore_commands' => [
+        'kafka:consume',
+    ],
     'ignore_routes' => [
         'prometheus.*'
     ],
@@ -60,7 +63,8 @@ return [
 ];
 ```
 
-**ignore_routes** - список имён роутов, для которых не нужно отслеживать время обработки http запросов.  
+**ignore_routes** - список имён роутов, для которых не нужно отслеживать время обработки http запросов.
+**ignore_commands** - список имён команд, для которых не нужно отслеживать метрики.  
 **http_requests_stats_groups** - список гистограмм и перцентилей. Каждая stats группа имеет список имён роутов, которые она отслеживает.
 Тем самым вы можете считать статистику не по всему приложению, а по отдельным группам эндпоинтов.
 
@@ -68,12 +72,17 @@ return [
 
 Имена метрик представлены без неймспейса.
 
-| Name                          | Type | Labels               | Description |
-|-------------------------------| ---- |----------------------| ----------- |
-| http_requests_total           | Counter | code, endpoint       | Счётчик входящих http запросов |
-| http_request_duration_seconds | Counter| code, type, endpoint | Счётчик времени обработки входящих http запросов |
-| http_stats_\<name\>           | Histogram or Summary |  | Статистика по времени обработки запросов для указанной в конфиге группы эндпоинтов |
-| log_messages_count            | Counter | level, endpoint      | Количество сообщений в логе |
+| Name                          | Type | Labels               | Description                                                                     |
+|-------------------------------| ---- |----------------------|---------------------------------------------------------------------------------|
+| http_requests_total           | Counter | code, endpoint       | Счётчик входящих http запросов                                                  |
+| http_request_duration_seconds | Counter| code, type, endpoint | Счётчик времени обработки входящих http запросов                                |
+| http_stats_\<name\>           | Histogram or Summary |                      | Статистика по времени обработки запросов для указанной в конфиге группы эндпоинтов |
+| log_messages_count            | Counter | level, endpoint      | Количество сообщений в логе                                                     |
+| queue_job_dispatched_total | Counter | connection, queue, job                  | Количество отправленных заданий в очередь                                       |
+| queue_job_runs_total | Counter | connection, queue, job                  | Количество обработанных заданий в очереди                                       |
+| queue_job_run_seconds_total | Counter | connection, queue, job                  | Счётчик времени выполнения заданий в очереди                                    |
+| command_runs_total | Counter | command, status                  | Количество завершенных команд                                                   |
+| command_run_seconds_total | Counter | command, status            | Счётчик времени выполнения команд                                               |
 
 
 ## License
