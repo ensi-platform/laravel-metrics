@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'ignore_commands' => [
+        'kafka:consume'
+    ],
     'ignore_routes' => [
         'prometheus.*'
     ],
