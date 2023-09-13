@@ -20,8 +20,12 @@ class CommandMetrics
         Prometheus::update('command_run_seconds_total', Helper::duration(), $labels);
     }
 
-    protected static function needToIgnoreCommand(string $command): bool
+    protected static function needToIgnoreCommand(?string $command): bool
     {
+        if (!isset($command)) {
+            return true;
+        }
+
         $commands = config('metrics.ignore_commands', []);
 
         return in_array($command, $commands);
