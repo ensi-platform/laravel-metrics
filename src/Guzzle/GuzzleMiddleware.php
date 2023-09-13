@@ -42,8 +42,12 @@ class GuzzleMiddleware
         $profiler = resolve(LatencyProfiler::class);
         $profiler->addAsyncTimeQuant($type, $start, $end);
 
-        Prometheus::update('http_client_seconds_total', $end - $start, [
-            'host' => $host
-        ]);
+        $labels = [
+            'host' => $host,
+        ];
+
+        Prometheus::update('http_client_seconds_total', $end - $start, $labels);
+
+        Prometheus::update('http_client_requests_total', 1, $labels);
     }
 }
