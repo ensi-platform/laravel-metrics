@@ -35,13 +35,13 @@ class ServiceProviderTest extends TestCase
         /** @var MetricsBag|MockInterface $metricsBag */
         $metricsBag = $this->mock(MetricsBag::class);
         $metricsBag->expects('counter')
-            ->times(13)
+            ->times(14)
             ->andReturnUsing(fn () => new Counter($metricsBag, 'n'));
 
         Prometheus::expects('bag')
             ->andReturn($metricsBag);
 
-        Prometheus::expects('addOnDemandMetric');
+        Prometheus::expects('addOnDemandMetric')->times(2);
 
         $serviceProvider = new MetricsServiceProvider($this->app);
         $serviceProvider->boot();
