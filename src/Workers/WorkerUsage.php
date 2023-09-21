@@ -11,14 +11,18 @@ class WorkerUsage implements OnDemandMetric
 {
     public function register(MetricsBag $metricsBag): void
     {
-        $metricsBag->gauge('workers_total');
-        $metricsBag->gauge('workers_idle');
+        if ($this->hasSwoole()) {
+            $metricsBag->gauge('workers_total');
+            $metricsBag->gauge('workers_idle');
+        }
     }
 
     public function update(MetricsBag $metricsBag): void
     {
-        Prometheus::update('workers_total', $this->getTotal());
-        Prometheus::update('workers_idle', $this->getIdle());
+        if ($this->hasSwoole()) {
+            Prometheus::update('workers_total', $this->getTotal());
+            Prometheus::update('workers_idle', $this->getIdle());
+        }
     }
 
     public function getTotal(): int
@@ -29,5 +33,10 @@ class WorkerUsage implements OnDemandMetric
     public function getIdle(): int
     {
         return app(Server::class)->stats()['idle_worker_num'];
+    }
+
+    private function hasSwoole(): bool
+    {
+        return app()->bound(Server::class);
     }
 }
