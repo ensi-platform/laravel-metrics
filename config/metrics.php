@@ -2,7 +2,8 @@
 
 return [
     'ignore_commands' => [
-        'kafka:consume'
+        'kafka:consume',
+        'queue:work',
     ],
     'ignore_routes' => [
         'prometheus.*'
