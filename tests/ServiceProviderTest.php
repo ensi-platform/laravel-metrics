@@ -63,13 +63,6 @@ class ServiceProviderTest extends TestCase
         Event::expects('listen')
                 ->withArgs([JobQueued::class, Mockery::any()]);
 
-//        Event::expects('listen')
-//                ->withArgs([JobProcessed::class, Mockery::any()]);
-
-//        Bus::pipeThrough([
-//            JobMiddleware::class,
-//        ]);
-
         Bus::shouldReceive('pipeThrough')
             ->once()
             ->withArgs([[JobMiddleware::class]]);
