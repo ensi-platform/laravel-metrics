@@ -8,7 +8,9 @@ use Illuminate\Console\Events\CommandFinished;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\JobQueued;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Ensi\LaravelMetrics\LatencyProfiler;
@@ -70,7 +72,7 @@ class EventListenersTest extends TestCase
                 return true;
             });
 
-        Event::dispatch(new JobProcessed($job->connectionName, $job));
+        Bus::dispatch($job);
     }
 
     public function testListenMessageCommandFinished(): void

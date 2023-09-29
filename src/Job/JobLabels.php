@@ -8,7 +8,7 @@ class JobLabels
 {
     public static function labelNames(): array
     {
-        return ['connection', 'queue', 'job'];
+        return ['connection', 'queue', 'job_name'];
     }
 
     public static function extractFromJob($job): array

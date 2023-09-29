@@ -4,6 +4,7 @@ namespace Ensi\LaravelMetrics;
 
 use Ensi\LaravelMetrics\Command\CommandLabels;
 use Ensi\LaravelMetrics\Command\CommandMetrics;
+use Ensi\LaravelMetrics\Job\JobMiddleware;
 use Ensi\LaravelMetrics\Kafka\KafkaLabels;
 use Illuminate\Console\Events\CommandFinished;
 use Illuminate\Console\Events\ScheduledTaskFinished;
@@ -12,6 +13,7 @@ use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobQueued;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Ensi\LaravelMetrics\Job\JobLabels;
@@ -111,10 +113,9 @@ class MetricsServiceProvider extends ServiceProvider
             Prometheus::update('queue_job_dispatched_total', 1, JobLabels::extractFromJob($event->job));
         });
 
-        Event::listen(JobProcessed::class, function (JobProcessed $event) {
-            Prometheus::update('queue_job_runs_total', 1, JobLabels::extractFromJob($event->job));
-            Prometheus::update('queue_job_run_seconds_total', Helper::duration(), JobLabels::extractFromJob($event->job));
-        });
+        Bus::pipeThrough([
+            JobMiddleware::class,
+        ]);
 
         Event::listen(ScheduledTaskFinished::class, function (ScheduledTaskFinished $event) {
             Prometheus::update('task_runs_total', 1, TaskLabels::extractFromTask($event->task));

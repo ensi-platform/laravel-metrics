@@ -15,6 +15,10 @@ class CustomJob extends QueueJob implements JobInterface
         $this->connection = $this->connectionName;
     }
 
+    public function __invoke()
+    {
+    }
+
     public static function factory(): self
     {
         $faker = Factory::create();
