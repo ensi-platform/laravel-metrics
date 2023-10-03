@@ -2,6 +2,7 @@
 
 namespace Ensi\LaravelMetrics\Tests;
 
+use Ensi\LaravelMetrics\Job\JobMiddleware;
 use Illuminate\Console\Events\CommandFinished;
 use Illuminate\Console\Events\ScheduledTaskFinished;
 use Illuminate\Database\Events\QueryExecuted;
@@ -9,6 +10,7 @@ use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobQueued;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
 use Ensi\LaravelMetrics\LatencyProfiler;
 use Ensi\LaravelMetrics\MetricsServiceProvider;
@@ -61,8 +63,9 @@ class ServiceProviderTest extends TestCase
         Event::expects('listen')
                 ->withArgs([JobQueued::class, Mockery::any()]);
 
-        Event::expects('listen')
-                ->withArgs([JobProcessed::class, Mockery::any()]);
+        Bus::shouldReceive('pipeThrough')
+            ->once()
+            ->withArgs([[JobMiddleware::class]]);
 
         Event::expects('listen')
             ->withArgs([ScheduledTaskFinished::class, Mockery::any()]);
