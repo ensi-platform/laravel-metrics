@@ -83,6 +83,8 @@ return [
 | queue_job_run_seconds_total | Counter | connection, queue, job                  | Счётчик времени выполнения заданий в очереди                                    |
 | command_runs_total | Counter | command, status                  | Количество завершенных команд                                                   |
 | command_run_seconds_total | Counter | command, status            | Счётчик времени выполнения команд                                               |
+| workers_total | Gauge | worker | Кол-во воркеров swoole |
+| workers_idle | Gauge | worker | Кол-во свободных воркеров swoole |
 
 
 ## License

@@ -20,6 +20,7 @@ use Ensi\LaravelMetrics\Job\JobLabels;
 use Ensi\LaravelMetrics\Job\QueueSize;
 use Ensi\LaravelMetrics\Labels\HttpRequestLabels;
 use Ensi\LaravelMetrics\Task\TaskLabels;
+use Ensi\LaravelMetrics\Workers\WorkerUsage;
 use Ensi\LaravelPrometheus\Prometheus;
 
 class MetricsServiceProvider extends ServiceProvider
@@ -130,5 +131,6 @@ class MetricsServiceProvider extends ServiceProvider
     private function registerOnDemandMetrics(): void
     {
         Prometheus::addOnDemandMetric(QueueSize::class);
+        Prometheus::addOnDemandMetric(WorkerUsage::class);
     }
 }

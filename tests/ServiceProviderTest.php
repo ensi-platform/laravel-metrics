@@ -43,7 +43,7 @@ class ServiceProviderTest extends TestCase
         Prometheus::expects('bag')
             ->andReturn($metricsBag);
 
-        Prometheus::expects('addOnDemandMetric');
+        Prometheus::expects('addOnDemandMetric')->times(2);
 
         $serviceProvider = new MetricsServiceProvider($this->app);
         $serviceProvider->boot();
