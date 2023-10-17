@@ -8,13 +8,14 @@ class KafkaLabels
 {
     public static function labelNames(): array
     {
-        return ['kafka'];
+        return ['kafka', 'status'];
     }
 
-    public static function extractFromMessage(Message $message): array
+    public static function extractFromMessage(Message $message, int $status): array
     {
         return [
             self::extractEntrypointFromInput(),
+            $status,
         ];
     }
 
