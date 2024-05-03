@@ -2,13 +2,13 @@
 
 namespace Ensi\LaravelMetrics\Tests;
 
+use Ensi\LaravelMetrics\Guzzle\GuzzleMiddleware;
+use Ensi\LaravelMetrics\LatencyProfiler;
 use Exception;
 use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Promise\RejectedPromise;
 use GuzzleHttp\Psr7\Request;
-use Ensi\LaravelMetrics\Guzzle\GuzzleMiddleware;
-use Ensi\LaravelMetrics\LatencyProfiler;
 use Mockery\MockInterface;
 
 class GuzzleMiddlewareTest extends TestCase

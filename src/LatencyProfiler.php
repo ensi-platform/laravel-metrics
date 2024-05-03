@@ -2,10 +2,10 @@
 
 namespace Ensi\LaravelMetrics;
 
-use Illuminate\Support\Facades\Route;
 use Ensi\LaravelMetrics\Labels\HttpRequestLabels;
 use Ensi\LaravelMetrics\StatsGroups\StatsGroup;
 use Ensi\LaravelPrometheus\MetricsBag;
+use Illuminate\Support\Facades\Route;
 
 class LatencyProfiler
 {
