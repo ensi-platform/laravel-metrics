@@ -3,10 +3,10 @@
 namespace Ensi\LaravelMetrics\HttpMiddleware;
 
 use Closure;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Ensi\LaravelMetrics\LatencyProfiler;
 use Ensi\LaravelPrometheus\Prometheus;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class HttpMetricsMiddleware
 {

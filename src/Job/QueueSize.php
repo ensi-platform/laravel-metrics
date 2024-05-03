@@ -2,9 +2,9 @@
 
 namespace Ensi\LaravelMetrics\Job;
 
-use Illuminate\Support\Facades\Queue;
 use Ensi\LaravelPrometheus\MetricsBag;
 use Ensi\LaravelPrometheus\OnDemandMetrics\OnDemandMetric;
+use Illuminate\Support\Facades\Queue;
 
 class QueueSize implements OnDemandMetric
 {

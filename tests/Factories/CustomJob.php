@@ -2,9 +2,9 @@
 
 namespace Ensi\LaravelMetrics\Tests\Factories;
 
+use Faker\Factory;
 use Illuminate\Contracts\Queue\Job as JobInterface;
 use Illuminate\Queue\Jobs\Job as QueueJob;
-use Faker\Factory;
 
 class CustomJob extends QueueJob implements JobInterface
 {

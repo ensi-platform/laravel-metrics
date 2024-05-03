@@ -3,19 +3,18 @@
 namespace Ensi\LaravelMetrics\Tests;
 
 use Ensi\LaravelMetrics\Job\JobLabels;
+use Ensi\LaravelMetrics\LatencyProfiler;
 use Ensi\LaravelMetrics\Tests\Factories\CustomJob;
+use Ensi\LaravelPrometheus\Prometheus;
 use Illuminate\Console\Events\CommandFinished;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Events\QueryExecuted;
-use Illuminate\Queue\Events\JobProcessed;
-use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
-use Ensi\LaravelMetrics\LatencyProfiler;
-use Ensi\LaravelPrometheus\Prometheus;
 use Mockery\MockInterface;
+use ReflectionMethod;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
@@ -50,7 +49,21 @@ class EventListenersTest extends TestCase
             ->once()
             ->withArgs(['queue_job_dispatched_total', 1, $labels]);
 
-        Event::dispatch(new JobQueued($job->connection, 1, $job));
+        // JobQueued signature have incompatible changes in LARAVEL 11.x
+        $arr = [];
+        foreach ((new ReflectionMethod(JobQueued::class, '__construct'))->getParameters() as $param) {
+            $arr[$param->getName()] = match ($param->getName()) {
+                'connectionName' => $job->connection,
+                'id' => 1,
+                'job' => $job,
+                // Laravel 10
+                'payload' => '',
+                // Laravel 11
+                'queue' => 'default',
+                'delay' => null,
+            };
+        }
+        Event::dispatch(new JobQueued(...$arr));
     }
 
     public function testListenMessageJobProcessed(): void
