@@ -2,13 +2,14 @@
 
 namespace Ensi\LaravelMetrics\StatsGroups;
 
-use Illuminate\Support\Facades\Route;
 use Ensi\LaravelPrometheus\MetricsBag;
+use Illuminate\Support\Facades\Route;
 
 abstract class StatsGroup
 {
-    public abstract function registerMetrics(MetricsBag $metricsBag): void;
-    protected abstract function updateMetrics(MetricsBag $metricsBag, float $totalTime): void;
+    abstract public function registerMetrics(MetricsBag $metricsBag): void;
+
+    abstract protected function updateMetrics(MetricsBag $metricsBag, float $totalTime): void;
 
     public function __construct(
         protected string $name,

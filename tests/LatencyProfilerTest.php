@@ -2,11 +2,11 @@
 
 namespace Ensi\LaravelMetrics\Tests;
 
-use Illuminate\Routing\Route as CurrentRoute;
-use Illuminate\Support\Facades\Route;
 use Ensi\LaravelMetrics\LatencyProfiler;
 use Ensi\LaravelPrometheus\Metrics\Counter;
 use Ensi\LaravelPrometheus\MetricsBag;
+use Illuminate\Routing\Route as CurrentRoute;
+use Illuminate\Support\Facades\Route;
 use Mockery\MockInterface;
 
 class LatencyProfilerTest extends TestCase
@@ -39,7 +39,7 @@ class LatencyProfilerTest extends TestCase
     public function testRegisterMetricsWithoutStats(): void
     {
         config([
-            'metrics.http_requests_stats_groups' => []
+            'metrics.http_requests_stats_groups' => [],
         ]);
 
         /** @var MetricsBag|MockInterface $metricsBag */
@@ -65,7 +65,7 @@ class LatencyProfilerTest extends TestCase
                     'route_names' => ['*'],
                     'buckets' => [0.01, 0.02, 0.04, 0.08, 0.16],
                 ],
-            ]
+            ],
         ]);
 
         /** @var MetricsBag|MockInterface $metricsBag */
@@ -97,7 +97,8 @@ class LatencyProfilerTest extends TestCase
 
         $latencyProfiler->writeMetrics($metricsBag, 200, 0.55);
     }
-    public function quantsProvider(): array
+
+    public static function quantsProvider(): array
     {
         return [
             [[1], 10, 1, 9],
@@ -137,7 +138,7 @@ class LatencyProfilerTest extends TestCase
         $latencyProfiler->writeMetrics($metricsBag, 200, $totalTime);
     }
 
-    public function asyncQuantsProvider(): array
+    public static function asyncQuantsProvider(): array
     {
         return [
             [
@@ -148,7 +149,7 @@ class LatencyProfilerTest extends TestCase
                 ],
                 1,
                 0.29613423347473,
-                0.7038
+                0.7038,
             ],
             [[[1, 2]], 10, 1, 9],
             [[[1, 3], [2, 4]], 10, 3, 7],
@@ -227,7 +228,7 @@ class LatencyProfilerTest extends TestCase
                     'route_names' => ['profile'],
                     'buckets' => [0.01, 0.02, 0.04, 0.08, 0.16],
                 ],
-            ]
+            ],
         ]);
 
         /** @var MetricsBag|MockInterface $metricsBag */

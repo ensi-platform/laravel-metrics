@@ -4,24 +4,23 @@ namespace Ensi\LaravelMetrics;
 
 use Ensi\LaravelMetrics\Command\CommandLabels;
 use Ensi\LaravelMetrics\Command\CommandMetrics;
+use Ensi\LaravelMetrics\Job\JobLabels;
 use Ensi\LaravelMetrics\Job\JobMiddleware;
+use Ensi\LaravelMetrics\Job\QueueSize;
 use Ensi\LaravelMetrics\Kafka\KafkaLabels;
+use Ensi\LaravelMetrics\Labels\HttpRequestLabels;
+use Ensi\LaravelMetrics\Task\TaskLabels;
+use Ensi\LaravelMetrics\Workers\WorkerUsage;
+use Ensi\LaravelPrometheus\Prometheus;
 use Illuminate\Console\Events\CommandFinished;
 use Illuminate\Console\Events\ScheduledTaskFinished;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Queue\Events\JobFailed;
-use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
-use Ensi\LaravelMetrics\Job\JobLabels;
-use Ensi\LaravelMetrics\Job\QueueSize;
-use Ensi\LaravelMetrics\Labels\HttpRequestLabels;
-use Ensi\LaravelMetrics\Task\TaskLabels;
-use Ensi\LaravelMetrics\Workers\WorkerUsage;
-use Ensi\LaravelPrometheus\Prometheus;
 
 class MetricsServiceProvider extends ServiceProvider
 {
@@ -62,7 +61,7 @@ class MetricsServiceProvider extends ServiceProvider
             ->labels(JobLabels::labelNames());
 
         $metricsBag->counter('queue_job_dispatched_total')
-                ->labels(JobLabels::labelNames());
+            ->labels(JobLabels::labelNames());
 
         $metricsBag->counter('task_runs_total')
             ->labels(TaskLabels::labelNames());
@@ -80,16 +79,16 @@ class MetricsServiceProvider extends ServiceProvider
             ->labels(['host']);
 
         $metricsBag->counter('kafka_runs_total')
-                ->labels(KafkaLabels::labelNames());
+            ->labels(KafkaLabels::labelNames());
 
         $metricsBag->counter('kafka_run_seconds_total')
-                ->labels(KafkaLabels::labelNames());
+            ->labels(KafkaLabels::labelNames());
 
         $metricsBag->counter('command_runs_total')
-                ->labels(CommandLabels::labelNames());
+            ->labels(CommandLabels::labelNames());
 
         $metricsBag->counter('command_run_seconds_total')
-                ->labels(CommandLabels::labelNames());
+            ->labels(CommandLabels::labelNames());
 
         resolve(LatencyProfiler::class)->registerMetrics($metricsBag);
     }

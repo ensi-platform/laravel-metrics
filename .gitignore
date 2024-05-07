@@ -2,4 +2,5 @@
 vendor
 composer.lock
 studio.json
-.phpunit.cache
+.phpunit.*
+.php-cs-fixer.cache

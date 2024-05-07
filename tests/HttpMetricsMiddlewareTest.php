@@ -2,10 +2,10 @@
 
 namespace Ensi\LaravelMetrics\Tests;
 
+use Ensi\LaravelMetrics\HttpMiddleware\HttpMetricsMiddleware;
+use Ensi\LaravelMetrics\LatencyProfiler;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Ensi\LaravelMetrics\LatencyProfiler;
-use Ensi\LaravelMetrics\HttpMiddleware\HttpMetricsMiddleware;
 use Mockery\MockInterface;
 
 class HttpMetricsMiddlewareTest extends TestCase
