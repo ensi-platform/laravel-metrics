@@ -3,6 +3,7 @@
 namespace Ensi\LaravelMetrics\StatsGroups;
 
 use Ensi\LaravelPrometheus\MetricsBag;
+use Exception;
 use Illuminate\Support\Facades\Route;
 
 abstract class StatsGroup
@@ -17,11 +18,12 @@ abstract class StatsGroup
     ) {
     }
 
-    public static function createByType(string $name, array $options): static
+    public static function createByType(string $name, array $options): StatsGroup
     {
         return match ($options['type']) {
             'summary' => new SummaryStatsGroup($name, $options),
             'histogram' => new HistogramStatsGroup($name, $options),
+            default => throw new Exception('Not supported type: ' . $options['type'])
         };
     }
 
