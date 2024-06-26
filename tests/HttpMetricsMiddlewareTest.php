@@ -8,24 +8,26 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Mockery\MockInterface;
 
-class HttpMetricsMiddlewareTest extends TestCase
-{
-    public function testMiddleware()
-    {
-        /** @var LatencyProfiler|MockInterface $latencyProfiler */
-        $latencyProfiler = $this->mock(LatencyProfiler::class);
-        $latencyProfiler->expects('writeMetrics');
+use function PHPUnit\Framework\assertSame;
 
-        $middleware = new HttpMetricsMiddleware($latencyProfiler);
-        $expectedRequest = new Request();
-        $expectedResponse = new Response();
+uses(TestCase::class);
 
-        $response = $middleware->handle($expectedRequest, function (Request $request) use ($expectedRequest, $expectedResponse) {
-            $this->assertSame($expectedRequest, $request);
+test('test middleware', function () {
+    /** @var TestCase $this */
 
-            return $expectedResponse;
-        });
+    /** @var LatencyProfiler|MockInterface $latencyProfiler */
+    $latencyProfiler = $this->mock(LatencyProfiler::class);
+    $latencyProfiler->expects('writeMetrics');
 
-        $this->assertSame($expectedResponse, $response);
-    }
-}
+    $middleware = new HttpMetricsMiddleware($latencyProfiler);
+    $expectedRequest = new Request();
+    $expectedResponse = new Response();
+
+    $response = $middleware->handle($expectedRequest, function (Request $request) use ($expectedRequest, $expectedResponse) {
+        assertSame($expectedRequest, $request);
+
+        return $expectedResponse;
+    });
+
+    assertSame($expectedResponse, $response);
+});

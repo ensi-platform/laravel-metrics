@@ -24,17 +24,18 @@ use Illuminate\Support\ServiceProvider;
 
 class MetricsServiceProvider extends ServiceProvider
 {
-    public function register()
+    public function register(): void
     {
+        $this->mergeConfigFrom(__DIR__ . '/../config/metrics.php', 'metrics');
+
         $this->app->singleton(LatencyProfiler::class);
-        $this->mergeConfigFrom(__DIR__.'/../config/metrics.php', 'metrics');
     }
 
-    public function boot()
+    public function boot(): void
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__.'/../config/metrics.php' => config_path('metrics.php'),
+                __DIR__ . '/../config/metrics.php' => config_path('metrics.php'),
             ], 'metrics-config');
         }
 
@@ -43,7 +44,7 @@ class MetricsServiceProvider extends ServiceProvider
         $this->registerOnDemandMetrics();
     }
 
-    private function registerMetrics()
+    private function registerMetrics(): void
     {
         $metricsBag = Prometheus::bag();
 
@@ -93,7 +94,7 @@ class MetricsServiceProvider extends ServiceProvider
         resolve(LatencyProfiler::class)->registerMetrics($metricsBag);
     }
 
-    private function registerEventListeners()
+    private function registerEventListeners(): void
     {
         Event::listen(QueryExecuted::class, function (QueryExecuted $event) {
             /** @var LatencyProfiler $profiler */

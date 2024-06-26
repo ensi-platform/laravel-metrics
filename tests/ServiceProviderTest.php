@@ -19,60 +19,64 @@ use Illuminate\Support\Facades\Event;
 use Mockery;
 use Mockery\MockInterface;
 
-class ServiceProviderTest extends TestCase
-{
-    public function testRegisterLatencyProfiler(): void
-    {
-        $this->assertInstanceOf(LatencyProfiler::class, resolve(LatencyProfiler::class));
-    }
+use function PHPUnit\Framework\assertInstanceOf;
 
-    public function testRegisterMetrics(): void
-    {
-        /** @var LatencyProfiler|MockInterface $latencyProfiler */
-        $latencyProfiler = $this->mock(LatencyProfiler::class);
-        $latencyProfiler->expects('registerMetrics');
-        app()->instance(LatencyProfiler::class, $latencyProfiler);
+uses(TestCase::class);
 
-        /** @var MetricsBag|MockInterface $metricsBag */
-        $metricsBag = $this->mock(MetricsBag::class);
-        $metricsBag->expects('counter')
-            ->times(14)
-            ->andReturnUsing(fn () => new Counter($metricsBag, 'n'));
+test('test register latency profiler', function () {
+    /** @var TestCase $this */
 
-        Prometheus::expects('bag')
-            ->andReturn($metricsBag);
+    assertInstanceOf(LatencyProfiler::class, resolve(LatencyProfiler::class));
+});
 
-        Prometheus::expects('addOnDemandMetric')->times(2);
+test('test register metrics', function () {
+    /** @var TestCase $this */
 
-        $serviceProvider = new MetricsServiceProvider($this->app);
-        $serviceProvider->boot();
-    }
+    /** @var LatencyProfiler|MockInterface $latencyProfiler */
+    $latencyProfiler = $this->mock(LatencyProfiler::class);
+    $latencyProfiler->expects('registerMetrics');
+    app()->instance(LatencyProfiler::class, $latencyProfiler);
 
-    public function testRegisterEventListeners(): void
-    {
-        Event::expects('listen')
-            ->withArgs([QueryExecuted::class, Mockery::any()]);
+    /** @var MetricsBag|MockInterface $metricsBag */
+    $metricsBag = $this->mock(MetricsBag::class);
+    $metricsBag->expects('counter')
+        ->times(14)
+        ->andReturnUsing(fn () => new Counter($metricsBag, 'n'));
 
-        Event::expects('listen')
-            ->withArgs([MessageLogged::class, Mockery::any()]);
+    Prometheus::expects('bag')
+        ->andReturn($metricsBag);
 
-        Event::expects('listen')
-            ->withArgs([JobFailed::class, Mockery::any()]);
+    Prometheus::expects('addOnDemandMetric')->times(2);
 
-        Event::expects('listen')
-            ->withArgs([JobQueued::class, Mockery::any()]);
+    $serviceProvider = new MetricsServiceProvider($this->app);
+    $serviceProvider->boot();
+});
 
-        Bus::shouldReceive('pipeThrough')
-            ->once()
-            ->withArgs([[JobMiddleware::class]]);
+test('test register event listeners', function () {
+    /** @var TestCase $this */
 
-        Event::expects('listen')
-            ->withArgs([ScheduledTaskFinished::class, Mockery::any()]);
+    Event::expects('listen')
+        ->withArgs([QueryExecuted::class, Mockery::any()]);
 
-        Event::expects('listen')
-            ->withArgs([CommandFinished::class, Mockery::any()]);
+    Event::expects('listen')
+        ->withArgs([MessageLogged::class, Mockery::any()]);
 
-        $serviceProvider = new MetricsServiceProvider($this->app);
-        $serviceProvider->boot();
-    }
-}
+    Event::expects('listen')
+        ->withArgs([JobFailed::class, Mockery::any()]);
+
+    Event::expects('listen')
+        ->withArgs([JobQueued::class, Mockery::any()]);
+
+    Bus::shouldReceive('pipeThrough')
+        ->once()
+        ->withArgs([[JobMiddleware::class]]);
+
+    Event::expects('listen')
+        ->withArgs([ScheduledTaskFinished::class, Mockery::any()]);
+
+    Event::expects('listen')
+        ->withArgs([CommandFinished::class, Mockery::any()]);
+
+    $serviceProvider = new MetricsServiceProvider($this->app);
+    $serviceProvider->boot();
+});

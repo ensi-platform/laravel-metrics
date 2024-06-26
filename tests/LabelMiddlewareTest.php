@@ -5,17 +5,19 @@ namespace Ensi\LaravelMetrics\Tests;
 use Ensi\LaravelMetrics\Labels\HttpRequestLabels;
 use Illuminate\Support\Facades\Route;
 
-class LabelMiddlewareTest extends TestCase
-{
-    public function testEndpointLabelMiddleware()
-    {
-        Route::shouldReceive('current')
-            ->once()
-            ->andReturn(tap(new \stdClass(), fn ($route) => $route->uri = "api/login"));
+use function PHPUnit\Framework\assertEquals;
 
-        $labelMiddleware = new HttpRequestLabels();
+uses(TestCase::class);
 
-        $this->assertEquals(['endpoint'], $labelMiddleware->labels());
-        $this->assertEquals(['GET api/login'], $labelMiddleware->values());
-    }
-}
+test('test endpoint label middleware', function () {
+    /** @var TestCase $this */
+
+    Route::shouldReceive('current')
+        ->once()
+        ->andReturn(tap(new \stdClass(), fn ($route) => $route->uri = "api/login"));
+
+    $labelMiddleware = new HttpRequestLabels();
+
+    assertEquals(['endpoint'], $labelMiddleware->labels());
+    assertEquals(['GET api/login'], $labelMiddleware->values());
+});

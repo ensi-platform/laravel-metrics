@@ -7,6 +7,7 @@ use Ensi\LaravelPrometheus\Prometheus;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Promise\RejectedPromise;
 use Psr\Http\Message\RequestInterface;
+
 use function resolve;
 
 class GuzzleMiddleware

@@ -1,21 +1,29 @@
 # General prometheus metrics for laravel
 
-Пакет добавляет метрики общего назначения для веб-приложения на laravel.
-Является дополнением к [ensi/laravel-prometheus](https://github.com/ensi-platform/laravel-prometheus)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/ensi/laravel-metrics.svg?style=flat-square)](https://packagist.org/packages/ensi/laravel-metrics)
+[![Tests](https://github.com/ensi-platform/laravel-metrics/actions/workflows/run-tests.yml/badge.svg?branch=master)](https://github.com/ensi-platform/laravel-metrics/actions/workflows/run-tests.yml)
+[![Total Downloads](https://img.shields.io/packagist/dt/ensi/laravel-metrics.svg?style=flat-square)](https://packagist.org/packages/ensi/laravel-metrics)
+
+The package adds general-purpose metrics for a laravel web application.
+It is an addition to[ensi/laravel-prometheus](https://github.com/ensi-platform/laravel-prometheus)
 
 ## Installation
 
-Добавьте пакет в приложение
+You can install the package via composer:
+
 ```bash
 composer require ensi/laravel-metrics
 ```
 
-Скопируйте конфигурацию для дальнейшей настройки
+Publish the config with:
+
 ```bash
-php artisan vendor:publish --tag=metrics-config
+php artisan vendor:publish --provider="Ensi\LaravelMetrics\MetricsServiceProvider"
 ```
 
-Добавьте Http Middleware
+## Basic Usage
+
+Add Http Middleware
 
 ```php
 # app/Http/Kernel.php
@@ -26,7 +34,8 @@ protected $middleware = [
 ];
 ```
 
-Добавьте Guzzle Middleware к вашим http клиентам
+Add Guzzle Middleware to your http clients
+
 ```php
 $handlerStack = HandlerStack::create();
 
@@ -38,7 +47,8 @@ $response1 = $client->get('http://httpbin.org/get');
 
 # Configuration
 
-Структура файла конфигурации
+The structure of the configuration file
+
 ```php
 return [
     'ignore_commands' => [
@@ -63,29 +73,42 @@ return [
 ];
 ```
 
-**ignore_routes** - список имён роутов, для которых не нужно отслеживать время обработки http запросов.
-**ignore_commands** - список имён команд, для которых не нужно отслеживать метрики.  
-**http_requests_stats_groups** - список гистограмм и перцентилей. Каждая stats группа имеет список имён роутов, которые она отслеживает.
-Тем самым вы можете считать статистику не по всему приложению, а по отдельным группам эндпоинтов.
+**ignore_routes** - a list of names of routes for which you do not need to track the processing time of http requests.  
+**ignore_commands** - a list of team names for which you do not need to track metrics.  
+**http_requests_stats_groups** - a list of histograms and percentiles. Each stats group has a list of the names of the routes that it tracks.  
+Thus, you can count statistics not for the entire application, but for individual groups of endpoints.
 
 ## Metrics
 
-Имена метрик представлены без неймспейса.
+The names of the metrics are presented without the namespace.
 
-| Name                          | Type | Labels               | Description                                                                     |
-|-------------------------------| ---- |----------------------|---------------------------------------------------------------------------------|
-| http_requests_total           | Counter | code, endpoint       | Счётчик входящих http запросов                                                  |
-| http_request_duration_seconds | Counter| code, type, endpoint | Счётчик времени обработки входящих http запросов                                |
-| http_stats_\<name\>           | Histogram or Summary |                      | Статистика по времени обработки запросов для указанной в конфиге группы эндпоинтов |
-| log_messages_count            | Counter | level, endpoint      | Количество сообщений в логе                                                     |
-| queue_job_dispatched_total | Counter | connection, queue, job                  | Количество отправленных заданий в очередь                                       |
-| queue_job_runs_total | Counter | connection, queue, job                  | Количество обработанных заданий в очереди                                       |
-| queue_job_run_seconds_total | Counter | connection, queue, job                  | Счётчик времени выполнения заданий в очереди                                    |
-| command_runs_total | Counter | command, status                  | Количество завершенных команд                                                   |
-| command_run_seconds_total | Counter | command, status            | Счётчик времени выполнения команд                                               |
-| workers_total | Gauge | worker | Кол-во воркеров swoole |
-| workers_idle | Gauge | worker | Кол-во свободных воркеров swoole |
+| Name                          | Type                 | Labels                 | Description                                                                          |
+|-------------------------------|----------------------|------------------------|--------------------------------------------------------------------------------------|
+| http_requests_total           | Counter              | code, endpoint         | Counter of incoming http requests                                                    |
+| http_request_duration_seconds | Counter              | code, type, endpoint   | Time counter for processing incoming http requests                                   |
+| http_stats_\<name\>           | Histogram or Summary |                        | Statistics on request processing time for the endpoint group specified in the config |
+| log_messages_count            | Counter              | level, endpoint        | Number of messages in the log                                                        |
+| queue_job_dispatched_total    | Counter              | connection, queue, job | The number of jobs sent to the queue                                                 |
+| queue_job_runs_total          | Counter              | connection, queue, job | The number of processed jobs in the queue                                            |
+| queue_job_run_seconds_total   | Counter              | connection, queue, job | Time counter for completing tasks in the queue                                       |
+| command_runs_total            | Counter              | command, status        | Number of completed commands                                                         |
+| command_run_seconds_total     | Counter              | command, status        | Command execution time counter                                                       |
+| workers_total                 | Gauge                | worker                 | Number of swoole workers                                                             |
+| workers_idle                  | Gauge                | worker                 | Number of free swoole workers                                                        |
 
+## Contributing
+
+Please see [CONTRIBUTING](.github/CONTRIBUTING.md) for details.
+
+### Testing
+
+1. composer install
+2. composer test
+
+## Security Vulnerabilities
+
+Please review [our security policy](.github/SECURITY.md) on how to report security vulnerabilities.
 
 ## License
-Laravel Metrics is open-sourced software licensed under the [MIT license](LICENSE.md).
+
+The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
