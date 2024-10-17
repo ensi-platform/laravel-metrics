@@ -8,17 +8,17 @@ return [
         'storage:link',
     ],
     'ignore_routes' => [
-        'prometheus.*'
+        'prometheus.*',
     ],
     'http_requests_stats_groups' => [
-        'default' => [
-            'type' => 'summary',
-            'route_names' => ['*'],
-            'time_window' => 60,
-            'quantiles' => [0.5, 0.95],
-        ],
+        // set your setting, like in README.md
+//        'default' => [
+//            'type' => 'histogram',
+//            'route_names' => ['*'],
+//            'buckets' => [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10],
+//        ],
     ],
     'watch_queues' => [
         'default',
-    ]
+    ],
 ];

@@ -59,15 +59,17 @@ return [
     ],
     'http_requests_stats_groups' => [
         '<stats-group-name>' => [
+            // don't use type 'summary', if your app is running in multiple containers, such as in k8s
             'type' => 'summary',
-            'route_names' => ['catalog.*', 'profile.favorites'],
+            'route_names' => ['*'], // or use prefix, like ['catalog.*', 'profile.favorites'],
             'time_window' => 30,
-            'quantiles' => [0.95, 0.99],
+            'quantiles' => [0.5, 0.75, ,0.95],
         ],
         '<stats-group-name>' => [
+            // In k8s we recommended this setting
             'type' => 'histogram',
-            'route_names' => ['*'],
-            'buckets' => [0.01, 0.05, 0.1, 0.5, 1, 2, 4],
+            'route_names' => ['*'], // or use prefix, like ['catalog.*', 'profile.favorites'],
+            'buckets' => [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10],
         ],
     ]
 ];
