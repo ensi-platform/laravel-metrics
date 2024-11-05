@@ -47,8 +47,8 @@ class GuzzleMiddleware
 
         $labels = [$host];
 
-        app()->terminating(fn() => Prometheus::update('http_client_seconds_total', $end - $start, $labels));
+        app()->terminating(fn () => Prometheus::update('http_client_seconds_total', $end - $start, $labels));
 
-        app()->terminating(fn() => Prometheus::update('http_client_requests_total', 1, $labels));
+        app()->terminating(fn () => Prometheus::update('http_client_requests_total', 1, $labels));
     }
 }
