@@ -29,5 +29,7 @@ test('test middleware', function () {
         return $expectedResponse;
     });
 
+    $middleware->terminate($expectedRequest, $expectedResponse);
+
     assertSame($expectedResponse, $response);
 });

@@ -10,6 +10,8 @@ use Illuminate\Http\Response;
 
 class HttpMetricsMiddleware
 {
+    protected int|float $duration;
+
     public function __construct(
         private readonly LatencyProfiler $latencyProfiler
     ) {
@@ -27,9 +29,13 @@ class HttpMetricsMiddleware
         $response = $next($request);
         $endTime = microtime(true);
 
-        $duration = $endTime - $startTime;
-        $this->latencyProfiler->writeMetrics(Prometheus::bag(), $response->getStatusCode(), $duration);
+        $this->duration = $endTime - $startTime;
 
         return $response;
+    }
+
+    public function terminate(Request $request, Response $response): void
+    {
+        $this->latencyProfiler->writeMetrics(Prometheus::bag(), $response->getStatusCode(), $this->duration);
     }
 }

@@ -30,7 +30,7 @@ class KafkaMetricsMiddleware
         $duration = microtime(true) - $startKafka;
         $labels = KafkaLabels::extractFromMessage($message, $status->value);
 
-        Prometheus::update('kafka_runs_total', 1, $labels);
-        Prometheus::update('kafka_run_seconds_total', $duration, $labels);
+        app()->terminating(fn() => Prometheus::update('kafka_runs_total', 1, $labels));
+        app()->terminating(fn() => Prometheus::update('kafka_run_seconds_total', $duration, $labels));
     }
 }

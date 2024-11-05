@@ -103,15 +103,15 @@ class MetricsServiceProvider extends ServiceProvider
         });
 
         Event::listen(MessageLogged::class, function (MessageLogged $event) {
-            Prometheus::update('log_messages_count', 1, [$event->level]);
+            app()->terminating(fn() => Prometheus::update('log_messages_count', 1, [$event->level]));
         });
 
         Event::listen(JobFailed::class, function (JobFailed $event) {
-            Prometheus::update('queue_job_failed_total', 1, JobLabels::extractFromJob($event->job));
+            app()->terminating(fn() => Prometheus::update('queue_job_failed_total', 1, JobLabels::extractFromJob($event->job)));
         });
 
         Event::listen(JobQueued::class, function (JobQueued $event) {
-            Prometheus::update('queue_job_dispatched_total', 1, JobLabels::extractFromJob($event->job));
+            app()->terminating(fn() => Prometheus::update('queue_job_dispatched_total', 1, JobLabels::extractFromJob($event->job)));
         });
 
         Bus::pipeThrough([
@@ -119,8 +119,8 @@ class MetricsServiceProvider extends ServiceProvider
         ]);
 
         Event::listen(ScheduledTaskFinished::class, function (ScheduledTaskFinished $event) {
-            Prometheus::update('task_runs_total', 1, TaskLabels::extractFromTask($event->task));
-            Prometheus::update('task_run_seconds_total', $event->runtime, TaskLabels::extractFromTask($event->task));
+            app()->terminating(fn() => Prometheus::update('task_runs_total', 1, TaskLabels::extractFromTask($event->task)));
+            app()->terminating(fn() => Prometheus::update('task_run_seconds_total', $event->runtime, TaskLabels::extractFromTask($event->task)));
         });
 
         Event::listen(CommandFinished::class, function (CommandFinished $event) {
