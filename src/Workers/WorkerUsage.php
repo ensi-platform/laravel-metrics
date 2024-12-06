@@ -20,8 +20,8 @@ class WorkerUsage implements OnDemandMetric
     public function update(MetricsBag $metricsBag): void
     {
         if ($this->hasSwoole()) {
-            app()->terminating(fn() => Prometheus::update('workers_total', $this->getTotal()));
-            app()->terminating(fn() => Prometheus::update('workers_idle', $this->getIdle()));
+            app()->terminating(fn () => Prometheus::update('workers_total', $this->getTotal()));
+            app()->terminating(fn () => Prometheus::update('workers_idle', $this->getIdle()));
         }
     }
 

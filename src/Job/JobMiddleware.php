@@ -14,7 +14,7 @@ class JobMiddleware
         $next($job);
         $duration = microtime(true) - $start;
 
-        app()->terminating(fn() => Prometheus::update('queue_job_runs_total', 1, $labels));
-        app()->terminating(fn() => Prometheus::update('queue_job_run_seconds_total', $duration, $labels));
+        app()->terminating(fn () => Prometheus::update('queue_job_runs_total', 1, $labels));
+        app()->terminating(fn () => Prometheus::update('queue_job_run_seconds_total', $duration, $labels));
     }
 }
