@@ -6,7 +6,7 @@ use Closure;
 use Ensi\LaravelMetrics\LatencyProfiler;
 use Ensi\LaravelPrometheus\Prometheus;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Response;
 
 class HttpMetricsMiddleware
 {
@@ -29,13 +29,9 @@ class HttpMetricsMiddleware
         $response = $next($request);
         $endTime = microtime(true);
 
-        $this->duration = $endTime - $startTime;
+        $duration = $endTime - $startTime;
+        app()->terminating(fn () => $this->latencyProfiler->writeMetrics(Prometheus::bag(), $response->getStatusCode(), $duration));
 
         return $response;
-    }
-
-    public function terminate(Request $request, Response $response): void
-    {
-        $this->latencyProfiler->writeMetrics(Prometheus::bag(), $response->getStatusCode(), $this->duration);
     }
 }
