@@ -6,7 +6,7 @@ use Closure;
 use Ensi\LaravelMetrics\LatencyProfiler;
 use Ensi\LaravelPrometheus\Prometheus;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response;
 
 class HttpMetricsMiddleware
 {
