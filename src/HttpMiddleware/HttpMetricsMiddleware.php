@@ -10,8 +10,6 @@ use Illuminate\Http\Response;
 
 class HttpMetricsMiddleware
 {
-    protected int|float $duration;
-
     public function __construct(
         private readonly LatencyProfiler $latencyProfiler
     ) {
