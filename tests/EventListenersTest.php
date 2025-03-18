@@ -43,6 +43,8 @@ test('test listen message logged', function () {
         ->withArgs(['log_messages_count', 1, ['info']]);
 
     logger()->info("hello");
+
+    app()->terminate();
 });
 
 test('test listen message job queued', function () {
@@ -70,6 +72,8 @@ test('test listen message job queued', function () {
         };
     }
     Event::dispatch(new JobQueued(...$arr));
+
+    app()->terminate();
 });
 
 test('test listen message job processed', function () {
@@ -93,6 +97,8 @@ test('test listen message job processed', function () {
         });
 
     Bus::dispatch($job);
+
+    app()->terminate();
 });
 
 test('test listen message command finished', function () {
@@ -120,6 +126,8 @@ test('test listen message command finished', function () {
         });
 
     Event::dispatch(new CommandFinished($command, $input, $output, $exitCode));
+
+    app()->terminate();
 });
 
 test('test listen message command finished skip', function () {

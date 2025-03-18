@@ -16,8 +16,8 @@ class CommandMetrics
 
         $labels = CommandLabels::extractFromTask($event);
 
-        Prometheus::update('command_runs_total', 1, $labels);
-        Prometheus::update('command_run_seconds_total', Helper::duration(), $labels);
+        app()->terminating(fn () => Prometheus::update('command_runs_total', 1, $labels));
+        app()->terminating(fn () => Prometheus::update('command_run_seconds_total', Helper::duration(), $labels));
     }
 
     protected static function needToIgnoreCommand(?string $command): bool
