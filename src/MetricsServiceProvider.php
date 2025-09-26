@@ -74,10 +74,10 @@ class MetricsServiceProvider extends ServiceProvider
             ->labels(TaskLabels::labelNames());
 
         $metricsBag->counter('http_client_seconds_total')
-            ->labels(['host']);
+            ->labels(['host', 'path']);
 
         $metricsBag->counter('http_client_requests_total')
-            ->labels(['host']);
+            ->labels(['host', 'path']);
 
         $metricsBag->counter('kafka_runs_total')
             ->labels(KafkaLabels::labelNames());
