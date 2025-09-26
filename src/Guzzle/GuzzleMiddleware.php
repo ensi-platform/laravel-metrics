@@ -45,7 +45,7 @@ class GuzzleMiddleware
         $profiler = resolve(LatencyProfiler::class);
         $profiler->addAsyncTimeQuant($type, $start, $end);
 
-        $labels = ['host'];
+        $labels = [$host];
         Prometheus::update('http_client_seconds_total', $end - $start, $labels);
         Prometheus::update('http_client_requests_total', 1, $labels);
 
@@ -54,16 +54,16 @@ class GuzzleMiddleware
         if ($labelNames === null) {
             return;
         }
-        $labels = [];
+        $labelsTwo = [];
         foreach ($labelNames as $labelName) {
-            $labels[] = match ($labelName) {
+            $labelsTwo[] = match ($labelName) {
                 'host' => $host,
                 'path' => preg_replace('#/(\d+)(?=/|$)#', '/{id}', $uriPath),
                 default => null,
             };
         }
-        $labels = array_filter($labels);
-        Prometheus::update('http_client_path_seconds_total', $end - $start, $labels);
-        Prometheus::update('http_client_path_requests_total', 1, $labels);        
+        $labelsTwo = array_filter($labelsTwo);
+        Prometheus::update('http_client_path_seconds_total', $end - $start, $labelsTwo);
+        Prometheus::update('http_client_path_requests_total', 1, $labelsTwo);        
     }
 }
