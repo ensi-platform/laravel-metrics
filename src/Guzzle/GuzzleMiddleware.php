@@ -20,16 +20,16 @@ class GuzzleMiddleware
                 $response = $handler($request, $options);
                 if ($response instanceof PromiseInterface) {
                     return $response->then(function ($result) use ($type, $start, $request) {
-                        self::handleResponse($type, $start, $request->getHeaderLine('host'));
+                        self::handleResponse($type, $start, $request->getHeaderLine('host'), $request->getUri()->getPath());
 
                         return $result;
                     })->otherwise(function ($reason) use ($type, $start, $request) {
-                        self::handleResponse($type, $start, $request->getHeaderLine('host'));
+                        self::handleResponse($type, $start, $request->getHeaderLine('host'), $request->getUri()->getPath());
 
                         return new RejectedPromise($reason);
                     });
                 } else {
-                    self::handleResponse($type, $start, $request->getHeaderLine('host'));
+                    self::handleResponse($type, $start, $request->getHeaderLine('host'), $request->getUri()->getPath());
                 }
 
                 return $response;
@@ -37,7 +37,7 @@ class GuzzleMiddleware
         };
     }
 
-    public static function handleResponse(string $type, $start, string $host): void
+    public static function handleResponse(string $type, $start, string $host, string $uriPath): void
     {
         $end = microtime(true);
 
@@ -45,7 +45,20 @@ class GuzzleMiddleware
         $profiler = resolve(LatencyProfiler::class);
         $profiler->addAsyncTimeQuant($type, $start, $end);
 
-        $labels = [$host];
+        if (config("metrics.http_client_stats_settings.$host") !== null) {
+            $labelNames = config("metrics.http_client_stats_settings.$host.labels");
+            $labels = [];
+            foreach ($labelNames as $labelName) {
+                $labels[] = match ($labelName) {
+                    'host' => $host,
+                    'method' => preg_replace('#/(\d+)#', '/{id}', $uriPath),
+                    default => null,
+                };
+            }
+            $labels = array_filter($labels);
+        } else {
+            $labels = [$host];
+        }
 
         Prometheus::update('http_client_seconds_total', $end - $start, $labels);
 
