@@ -54,7 +54,7 @@ class GuzzleMiddleware
         if ($labelNames === null) {
             return;
         }
-
+        $labels = [];
         foreach ($labelNames as $labelName) {
             $labels[] = match ($labelName) {
                 'host' => $host,
