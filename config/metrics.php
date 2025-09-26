@@ -20,7 +20,7 @@ return [
     ],
     'http_client_stats_settings' => [
         // 'external-domain.com' => [
-        //     'labels' => ['host', 'method'],
+        //     'labels' => ['host', 'path'],
         // ],
     ],
     'watch_queues' => [
