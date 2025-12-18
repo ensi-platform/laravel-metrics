@@ -79,11 +79,19 @@ class MetricsServiceProvider extends ServiceProvider
         $metricsBag->counter('http_client_requests_total')
             ->labels(['host']);
 
-        $metricsBag->counter('http_client_path_seconds_total')
+        $metricsBag->counter('http_client_endpoint_seconds_total')
             ->labels(['host', 'path']);
 
-        $metricsBag->counter('http_client_path_requests_total')
+        $metricsBag->counter('http_client_endpoint_requests_total')
             ->labels(['host', 'path']);
+
+        // Register histogram for percentiles if configured
+        $percentilesConfig = config('metrics.http_client_percentiles', []);
+        if ($percentilesConfig['enabled'] ?? false) {
+            $buckets = $percentilesConfig['buckets'] ?? [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10];
+            $metricsBag->histogram('http_client_percentiles', $buckets)
+                ->labels(['host', 'path']);
+        }
 
         $metricsBag->counter('kafka_runs_total')
             ->labels(KafkaLabels::labelNames());

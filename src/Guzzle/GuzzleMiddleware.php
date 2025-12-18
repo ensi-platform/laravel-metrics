@@ -40,30 +40,50 @@ class GuzzleMiddleware
     public static function handleResponse(string $type, $start, string $host, string $uriPath): void
     {
         $end = microtime(true);
+        $duration = $end - $start;
 
         /** @var LatencyProfiler $profiler */
         $profiler = resolve(LatencyProfiler::class);
         $profiler->addAsyncTimeQuant($type, $start, $end);
 
         $labels = [$host];
-        Prometheus::update('http_client_seconds_total', $end - $start, $labels);
+        Prometheus::update('http_client_seconds_total', $duration, $labels);
         Prometheus::update('http_client_requests_total', 1, $labels);
 
-        $httpClientStatsSettings = config('metrics.http_client_stats_settings', []);
-        $labelNames = $httpClientStatsSettings[$host]['labels'] ?? null;
-        if ($labelNames === null) {
-            return;
+        // Collect endpoint avg time if enabled
+        $endpointAvgConfig = config('metrics.http_client_endpoint_avg_time', []);
+        if ($endpointAvgConfig['enabled'] ?? false) {
+            $domains = $endpointAvgConfig['domains'] ?? [];
+            if (in_array('*', $domains) || in_array($host, $domains)) {
+                $path = preg_replace('#/(\d+)(?=/|$)#', '/{id}', $uriPath);
+                $endpointLabels = [$host, $path];
+                Prometheus::update('http_client_endpoint_seconds_total', $duration, $endpointLabels);
+                Prometheus::update('http_client_endpoint_requests_total', 1, $endpointLabels);
+            }
         }
-        $labelsTwo = [];
-        foreach ($labelNames as $labelName) {
-            $labelsTwo[] = match ($labelName) {
-                'host' => $host,
-                'path' => preg_replace('#/(\d+)(?=/|$)#', '/{id}', $uriPath),
-                default => null,
-            };
+
+        // Collect percentiles if enabled
+        $percentilesConfig = config('metrics.http_client_percentiles', []);
+        if ($percentilesConfig['enabled'] ?? false) {
+            $domains = $percentilesConfig['domains'] ?? [];
+            $endpoints = $percentilesConfig['endpoints'] ?? [];
+            $shouldCollect = false;
+            if (in_array('*', $domains) || in_array($host, $domains)) {
+                $shouldCollect = true;
+            } elseif (!empty($endpoints)) {
+                $fullEndpoint = $host . $uriPath;
+                foreach ($endpoints as $endpoint) {
+                    if (str_contains($fullEndpoint, $endpoint)) {
+                        $shouldCollect = true;
+                        break;
+                    }
+                }
+            }
+            if ($shouldCollect) {
+                $metricName = 'http_client_percentiles';
+                $path = preg_replace('#/(\d+)(?=/|$)#', '/{id}', $uriPath);
+                Prometheus::update($metricName, $duration, [$host, $path]);
+            }
         }
-        $labelsTwo = array_filter($labelsTwo);
-        Prometheus::update('http_client_path_seconds_total', $end - $start, $labelsTwo);
-        Prometheus::update('http_client_path_requests_total', 1, $labelsTwo);        
     }
 }
