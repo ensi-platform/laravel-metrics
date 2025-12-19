@@ -86,7 +86,8 @@ return [
 **ignore_commands** - a list of team names for which you do not need to track metrics.  
 **http_requests_stats_groups** - a list of histograms and percentiles. Each stats group has a list of the names of the routes that it tracks.  
 Thus, you can count statistics not for the entire application, but for individual groups of endpoints.  
-**http_client_stats** - configuration for outgoing HTTP client requests metrics. Set 'enabled' to true to collect histogram statistics on request processing time for specified domains.
+**http_client_per_path** - configuration for collecting per-path metrics for outgoing HTTP client requests. Specify domains to track request counts and durations per path.  
+**http_client_stats** - configuration for collecting histogram statistics on outgoing HTTP client request processing time for specified domains.
 
 ## Metrics
 
