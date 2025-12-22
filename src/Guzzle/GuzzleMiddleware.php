@@ -12,24 +12,56 @@ use function resolve;
 
 class GuzzleMiddleware
 {
-    public static function middleware(string $type = 'http_client')
-    {
-        return function (callable $handler) use ($type) {
-            return static function (RequestInterface $request, array $options) use ($type, $handler) {
+    /**
+     * Create Guzzle middleware for metrics collection
+     *
+     * @param string $type Metric type identifier
+     * @param bool $collectPathMetrics Enable per-path metrics collection (http_client_path_*)
+     * @param bool $collectStats Enable detailed statistics collection (http_client_stats)
+     * @return callable
+     */
+    public static function middleware(
+        string $type = 'http_client',
+        bool $collectPathMetrics = false,
+        bool $collectStats = false
+    ) {
+        return function (callable $handler) use ($type, $collectPathMetrics, $collectStats) {
+            return static function (RequestInterface $request, array $options) use ($type, $collectPathMetrics, $collectStats, $handler) {
                 $start = microtime(true);
                 $response = $handler($request, $options);
                 if ($response instanceof PromiseInterface) {
-                    return $response->then(function ($result) use ($type, $start, $request) {
-                        self::handleResponse($type, $start, $request->getHeaderLine('host'), $request->getUri()->getPath());
+                    return $response->then(function ($result) use ($type, $start, $request, $collectPathMetrics, $collectStats) {
+                        self::handleResponse(
+                            $type,
+                            $start,
+                            $request->getHeaderLine('host'),
+                            $request->getUri()->getPath(),
+                            $collectPathMetrics,
+                            $collectStats
+                        );
 
                         return $result;
-                    })->otherwise(function ($reason) use ($type, $start, $request) {
-                        self::handleResponse($type, $start, $request->getHeaderLine('host'), $request->getUri()->getPath());
+                    })->otherwise(function ($reason) use ($type, $start, $request, $collectPathMetrics, $collectStats) {
+                        self::handleResponse(
+                            $type,
+                            $start,
+                            $request->getHeaderLine('host'),
+                            $request->getUri()->getPath(),
+                            $collectPathMetrics,
+                            $collectStats
+                        );
 
                         return new RejectedPromise($reason);
                     });
                 } else {
-                    self::handleResponse($type, $start, $request->getHeaderLine('host'), $request->getUri()->getPath());
+                    self::handleResponse(
+                        $type,
+                        $start,
+                        $request->getHeaderLine('host'),
+                        $request->getUri()->getPath(),
+                        $collectPathMetrics,
+                        $collectStats
+                    );
                 }
 
                 return $response;
@@ -37,8 +69,14 @@ class GuzzleMiddleware
         };
     }
 
-    public static function handleResponse(string $type, $start, string $host, string $uriPath): void
-    {
+    public static function handleResponse(
+        string $type,
+        $start,
+        string $host,
+        string $uriPath,
+        bool $collectPathMetrics = false,
+        bool $collectStats = false
+    ): void {
         $end = microtime(true);
         $duration = $end - $start;
 
@@ -50,21 +88,27 @@ class GuzzleMiddleware
         Prometheus::update('http_client_seconds_total', $duration, $labels);
         Prometheus::update('http_client_requests_total', 1, $labels);
 
-        $pathAvgConfig = config('metrics.http_client_per_path', []);
-        $domains = $pathAvgConfig['domains'] ?? [];
-        if (in_array('*', $domains) || in_array($host, $domains)) {
-            $path = preg_replace('#/(\d+)(?=/|$)#', '/{id}', $uriPath);
+        if ($collectPathMetrics) {
+            $path = self::normalizePath($uriPath);
             $pathLabels = [$host, $path];
             Prometheus::update('http_client_path_seconds_total', $duration, $pathLabels);
             Prometheus::update('http_client_path_requests_total', 1, $pathLabels);
         }
 
-        $percentilesConfig = config('metrics.http_client_stats', []);
-        $domains = $percentilesConfig['domains'] ?? [];
-        if (in_array('*', $domains) || in_array($host, $domains)) {
-            $metricName = 'http_client_stats';
-            $path = preg_replace('#/(\d+)(?=/|$)#', '/{id}', $uriPath);
-            Prometheus::update($metricName, $duration, [$host, $path]);
+        if ($collectStats) {
+            $path = self::normalizePath($uriPath);
+            Prometheus::update('http_client_stats', $duration, [$host, $path]);
         }
+    }
+
+    /**
+     * Normalize URI path by replacing numeric segments with {id}
+     *
+     * @param string $path
+     * @return string
+     */
+    public static function normalizePath(string $path): string
+    {
+        return preg_replace('#/(\d+)(?=/|$)#', '/{id}', $path);
     }
 }

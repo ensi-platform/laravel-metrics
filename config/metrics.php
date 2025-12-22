@@ -18,15 +18,8 @@ return [
 //            'buckets' => [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10],
 //        ],
     ],
-    'http_client_per_path' => [
-        // set your setting, like in README.md
-        // 'domains' => ['*'],
-    ],
-    'http_client_stats' => [
-        // set your setting, like in README.md
-        // 'domains' => ['*'],
-        // 'buckets' => [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10],
-    ],
+    'http_client_stats_buckets' => [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10],
+
     'watch_queues' => [
         'default',
     ],

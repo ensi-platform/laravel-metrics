@@ -6,6 +6,7 @@ use Ensi\LaravelMetrics\Job\JobMiddleware;
 use Ensi\LaravelMetrics\LatencyProfiler;
 use Ensi\LaravelMetrics\MetricsServiceProvider;
 use Ensi\LaravelPrometheus\Metrics\Counter;
+use Ensi\LaravelPrometheus\Metrics\Histogram;
 use Ensi\LaravelPrometheus\MetricsBag;
 use Ensi\LaravelPrometheus\Prometheus;
 use Illuminate\Console\Events\CommandFinished;
@@ -42,6 +43,10 @@ test('test register metrics', function () {
     $metricsBag->expects('counter')
         ->times(16)
         ->andReturnUsing(fn () => new Counter($metricsBag, 'n'));
+
+    $metricsBag->expects('histogram')
+        ->once()
+        ->andReturnUsing(fn () => new Histogram($metricsBag, 'n', []));
 
     Prometheus::expects('bag')
         ->andReturn($metricsBag);

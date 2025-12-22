@@ -96,9 +96,6 @@ test('test failed async request', function () {
 test('test metrics update for simple request', function () {
     /** @var TestCase $this */
 
-    config(['metrics.http_client_per_path' => []]); // disabled
-    config(['metrics.http_client_stats' => []]); // disabled
-
     /** @var LatencyProfiler|MockInterface $latencyProfiler */
     $latencyProfiler = $this->mock(LatencyProfiler::class);
     $latencyProfiler->expects('addAsyncTimeQuant');
@@ -126,9 +123,6 @@ test('test metrics update for simple request', function () {
 test('test path metrics update when enabled', function () {
     /** @var TestCase $this */
 
-    config(['metrics.http_client_per_path' => ['domains' => ['*']]]);
-    config(['metrics.http_client_stats' => []]); // disabled
-
     /** @var LatencyProfiler|MockInterface $latencyProfiler */
     $latencyProfiler = $this->mock(LatencyProfiler::class);
     $latencyProfiler->expects('addAsyncTimeQuant');
@@ -149,7 +143,7 @@ test('test path metrics update when enabled', function () {
         ->once()
         ->with('http_client_path_requests_total', 1, ['example.org', '/path']);
 
-    $middleware = GuzzleMiddleware::middleware();
+    $middleware = GuzzleMiddleware::middleware('http_client', true, false);
     $request = new Request('GET', 'https://example.org/path');
     $options = [];
     $response = 'response';
@@ -163,9 +157,6 @@ test('test path metrics update when enabled', function () {
 
 test('test http_client_stats update when enabled', function () {
     /** @var TestCase $this */
-
-    config(['metrics.http_client_per_path' => []]); // disabled
-    config(['metrics.http_client_stats' => ['domains' => ['*']]]);
 
     /** @var LatencyProfiler|MockInterface $latencyProfiler */
     $latencyProfiler = $this->mock(LatencyProfiler::class);
@@ -183,8 +174,43 @@ test('test http_client_stats update when enabled', function () {
         ->once()
         ->with('http_client_stats', \Mockery::type('float'), ['example.org', '/path']);
 
-    $middleware = GuzzleMiddleware::middleware();
+    $middleware = GuzzleMiddleware::middleware('http_client', false, true);
     $request = new Request('GET', 'https://example.org/path');
+    $options = [];
+    $response = 'response';
+
+    $next = $middleware(function () use ($response) {
+        return $response;
+    });
+
+    $next($request, $options);
+});
+
+test('test path normalization with numeric segments', function () {
+    /** @var TestCase $this */
+
+    /** @var LatencyProfiler|MockInterface $latencyProfiler */
+    $latencyProfiler = $this->mock(LatencyProfiler::class);
+    $latencyProfiler->expects('addAsyncTimeQuant');
+
+    Prometheus::shouldReceive('update')
+        ->once()
+        ->with('http_client_seconds_total', \Mockery::type('float'), ['example.org']);
+
+    Prometheus::shouldReceive('update')
+        ->once()
+        ->with('http_client_requests_total', 1, ['example.org']);
+
+    Prometheus::shouldReceive('update')
+        ->once()
+        ->with('http_client_path_seconds_total', \Mockery::type('float'), ['example.org', '/users/{id}/posts/{id}']);
+
+    Prometheus::shouldReceive('update')
+        ->once()
+        ->with('http_client_path_requests_total', 1, ['example.org', '/users/{id}/posts/{id}']);
+
+    $middleware = GuzzleMiddleware::middleware('http_client', true, false);
+    $request = new Request('GET', 'https://example.org/users/123/posts/456');
     $options = [];
     $response = 'response';
 

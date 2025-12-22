@@ -39,11 +39,26 @@ Add Guzzle Middleware to your http clients
 ```php
 $handlerStack = HandlerStack::create();
 
+// Basic usage - only collects host-level metrics
 $handlerStack->push(GuzzleMiddleware::middleware());
+
+// With detailed path-level metrics
+$handlerStack->push(GuzzleMiddleware::middleware('http_client', true, false));
+
+// With histogram statistics
+$handlerStack->push(GuzzleMiddleware::middleware('http_client', false, true));
+
+// With both path metrics and statistics
+$handlerStack->push(GuzzleMiddleware::middleware('http_client', true, true));
 
 $client = new Client(['handler' => $handlerStack]);
 $response1 = $client->get('http://httpbin.org/get');
 ```
+
+The `middleware()` method accepts three parameters:
+- `$type` (string, default: 'http_client'): Metric type identifier
+- `$collectPathMetrics` (bool, default: false): Enable per-path metrics collection (http_client_path_*)
+- `$collectStats` (bool, default: false): Enable detailed statistics collection (http_client_stats)
 
 # Configuration
 
@@ -72,13 +87,10 @@ return [
             'buckets' => [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10],
         ],
     ],
-    'http_client_per_path' => [
-        'domains' => ['*'], // or list like ['domain1.com', 'domain2.com']
+    'http_client_stats_buckets' => [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10],
+    'watch_queues' => [
+        'default',
     ],
-    'http_client_stats' => [
-        'domains' => ['*'], // or list like ['domain1.com', 'domain2.com']
-        'buckets' => [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10],
-    ]
 ];
 ```
 
@@ -86,8 +98,7 @@ return [
 **ignore_commands** - a list of team names for which you do not need to track metrics.  
 **http_requests_stats_groups** - a list of histograms and percentiles. Each stats group has a list of the names of the routes that it tracks.  
 Thus, you can count statistics not for the entire application, but for individual groups of endpoints.  
-**http_client_per_path** - configuration for collecting per-path metrics for outgoing HTTP client requests. Specify domains to track request counts and durations per path.  
-**http_client_stats** - configuration for collecting histogram statistics on outgoing HTTP client request processing time for specified domains.
+**http_client_stats_buckets** - bucket configuration for the http_client_stats histogram metric used when collecting detailed statistics for HTTP client requests.
 
 ## Metrics
 
