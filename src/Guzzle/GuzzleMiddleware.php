@@ -88,16 +88,18 @@ class GuzzleMiddleware
         Prometheus::update('http_client_seconds_total', $duration, $labels);
         Prometheus::update('http_client_requests_total', 1, $labels);
 
-        if ($collectPathMetrics) {
-            $path = self::normalizePath($uriPath);
-            $pathLabels = [$host, $path];
-            Prometheus::update('http_client_path_seconds_total', $duration, $pathLabels);
-            Prometheus::update('http_client_path_requests_total', 1, $pathLabels);
-        }
+        if ($collectPathMetrics || $collectStats) {
+            $normalizedPath = self::normalizePath($uriPath);
+            $labels = [$host, $normalizedPath];
 
-        if ($collectStats) {
-            $path = self::normalizePath($uriPath);
-            Prometheus::update('http_client_stats', $duration, [$host, $path]);
+            if ($collectPathMetrics) {
+                Prometheus::update('http_client_path_seconds_total', $duration, $labels);
+                Prometheus::update('http_client_path_requests_total', 1, $labels);
+            }
+
+            if ($collectStats) {
+                Prometheus::update('http_client_stats', $duration, $labels);
+            }
         }
     }
 
