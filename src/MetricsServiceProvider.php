@@ -86,8 +86,8 @@ class MetricsServiceProvider extends ServiceProvider
             ->labels(['host', 'path']);
 
         // Register histogram for percentiles
-        $buckets = config('metrics.http_client_stats_buckets', [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10]);
-        $metricsBag->histogram('http_client_stats', $buckets)
+        $buckets = config('metrics.http_client_path_stats_buckets', [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10]);
+        $metricsBag->histogram('http_client_path_stats', $buckets)
             ->labels(['host', 'path']);
 
         $metricsBag->counter('kafka_runs_total')

@@ -155,7 +155,7 @@ test('test path metrics update when enabled', function () {
     $next($request, $options);
 });
 
-test('test http_client_stats update when enabled', function () {
+test('test http_client_path_stats update when enabled', function () {
     /** @var TestCase $this */
 
     /** @var LatencyProfiler|MockInterface $latencyProfiler */
@@ -172,7 +172,7 @@ test('test http_client_stats update when enabled', function () {
 
     Prometheus::shouldReceive('update')
         ->once()
-        ->with('http_client_stats', \Mockery::type('float'), ['example.org', '/path']);
+        ->with('http_client_path_stats', \Mockery::type('float'), ['example.org', '/path']);
 
     $middleware = GuzzleMiddleware::middleware('http_client', false, true);
     $request = new Request('GET', 'https://example.org/path');

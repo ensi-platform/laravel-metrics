@@ -58,7 +58,7 @@ $response1 = $client->get('http://httpbin.org/get');
 The `middleware()` method accepts three parameters:
 - `$type` (string, default: 'http_client'): Metric type identifier
 - `$collectPathMetrics` (bool, default: false): Enable per-path metrics collection (http_client_path_*)
-- `$collectStats` (bool, default: false): Enable detailed statistics collection (http_client_stats)
+- `$collectPathStats` (bool, default: false): Enable detailed statistics collection (http_client_path_stats)
 
 # Configuration
 
@@ -87,7 +87,7 @@ return [
             'buckets' => [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10],
         ],
     ],
-    'http_client_stats_buckets' => [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10],
+    'http_client_path_stats_buckets' => [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10],
     'watch_queues' => [
         'default',
     ],
@@ -98,7 +98,7 @@ return [
 **ignore_commands** - a list of team names for which you do not need to track metrics.  
 **http_requests_stats_groups** - a list of histograms and percentiles. Each stats group has a list of the names of the routes that it tracks.  
 Thus, you can count statistics not for the entire application, but for individual groups of endpoints.  
-**http_client_stats_buckets** - bucket configuration for the http_client_stats histogram metric used when collecting detailed statistics for HTTP client requests.
+**http_client_path_stats_buckets** - bucket configuration for the http_client_path_stats histogram metric used when collecting detailed statistics for HTTP client requests.
 
 ## Metrics
 
@@ -113,7 +113,7 @@ The names of the metrics are presented without the namespace.
 | http_client_seconds_total       | Counter              | host                   | Time counter for outgoing HTTP client requests                                       |
 | http_client_path_requests_total | Counter              | host, path             | Counter of outgoing HTTP client requests per path                                    |
 | http_client_path_seconds_total  | Counter              | host, path             | Time counter for outgoing HTTP client requests per path                              |
-| http_client_stats               | Histogram            | host, path             | Statistics on outgoing HTTP client request processing time                           |
+| http_client_path_stats          | Histogram            | host, path             | Statistics on outgoing HTTP client request processing time                           |
 | log_messages_count              | Counter              | level, endpoint        | Number of messages in the log                                                        |
 | queue_job_dispatched_total      | Counter              | connection, queue, job | The number of jobs sent to the queue                                                 |
 | queue_job_runs_total            | Counter              | connection, queue, job | The number of processed jobs in the queue                                            |
