@@ -39,11 +39,26 @@ Add Guzzle Middleware to your http clients
 ```php
 $handlerStack = HandlerStack::create();
 
+// Basic usage - only collects host-level metrics
 $handlerStack->push(GuzzleMiddleware::middleware());
+
+// With detailed path-level metrics
+$handlerStack->push(GuzzleMiddleware::middleware('http_client', true, false));
+
+// With histogram statistics
+$handlerStack->push(GuzzleMiddleware::middleware('http_client', false, true));
+
+// With both path metrics and statistics
+$handlerStack->push(GuzzleMiddleware::middleware('http_client', true, true));
 
 $client = new Client(['handler' => $handlerStack]);
 $response1 = $client->get('http://httpbin.org/get');
 ```
+
+The `middleware()` method accepts three parameters:
+- `$type` (string, default: 'http_client'): Metric type identifier
+- `$collectPathMetrics` (bool, default: false): Enable per-path metrics collection (http_client_path_*)
+- `$collectPathStats` (bool, default: false): Enable detailed statistics collection (http_client_path_stats)
 
 # Configuration
 
@@ -71,32 +86,42 @@ return [
             'route_names' => ['*'], // or use prefix, like ['catalog.*', 'profile.favorites'],
             'buckets' => [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10],
         ],
-    ]
+    ],
+    'http_client_path_stats_buckets' => [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10],
+    'watch_queues' => [
+        'default',
+    ],
 ];
 ```
 
 **ignore_routes** - a list of names of routes for which you do not need to track the processing time of http requests.  
 **ignore_commands** - a list of team names for which you do not need to track metrics.  
 **http_requests_stats_groups** - a list of histograms and percentiles. Each stats group has a list of the names of the routes that it tracks.  
-Thus, you can count statistics not for the entire application, but for individual groups of endpoints.
+Thus, you can count statistics not for the entire application, but for individual groups of endpoints.  
+**http_client_path_stats_buckets** - bucket configuration for the http_client_path_stats histogram metric used when collecting detailed statistics for HTTP client requests.
 
 ## Metrics
 
 The names of the metrics are presented without the namespace.
 
-| Name                          | Type                 | Labels                 | Description                                                                          |
-|-------------------------------|----------------------|------------------------|--------------------------------------------------------------------------------------|
-| http_requests_total           | Counter              | code, endpoint         | Counter of incoming http requests                                                    |
-| http_request_duration_seconds | Counter              | code, type, endpoint   | Time counter for processing incoming http requests                                   |
-| http_stats_\<name\>           | Histogram or Summary |                        | Statistics on request processing time for the endpoint group specified in the config |
-| log_messages_count            | Counter              | level, endpoint        | Number of messages in the log                                                        |
-| queue_job_dispatched_total    | Counter              | connection, queue, job | The number of jobs sent to the queue                                                 |
-| queue_job_runs_total          | Counter              | connection, queue, job | The number of processed jobs in the queue                                            |
-| queue_job_run_seconds_total   | Counter              | connection, queue, job | Time counter for completing tasks in the queue                                       |
-| command_runs_total            | Counter              | command, status        | Number of completed commands                                                         |
-| command_run_seconds_total     | Counter              | command, status        | Command execution time counter                                                       |
-| workers_total                 | Gauge                | worker                 | Number of swoole workers                                                             |
-| workers_idle                  | Gauge                | worker                 | Number of free swoole workers                                                        |
+| Name                            | Type                 | Labels                 | Description                                                                          |
+|---------------------------------|----------------------|------------------------|--------------------------------------------------------------------------------------|
+| http_requests_total             | Counter              | code, endpoint         | Counter of incoming http requests                                                    |
+| http_request_duration_seconds   | Counter              | code, type, endpoint   | Time counter for processing incoming http requests                                   |
+| http_stats_\<name\>             | Histogram or Summary |                        | Statistics on request processing time for the endpoint group specified in the config |
+| http_client_requests_total      | Counter              | host                   | Counter of outgoing HTTP client requests                                             |
+| http_client_seconds_total       | Counter              | host                   | Time counter for outgoing HTTP client requests                                       |
+| http_client_path_requests_total | Counter              | host, path             | Counter of outgoing HTTP client requests per path                                    |
+| http_client_path_seconds_total  | Counter              | host, path             | Time counter for outgoing HTTP client requests per path                              |
+| http_client_path_stats          | Histogram            | host, path             | Statistics on outgoing HTTP client request processing time                           |
+| log_messages_count              | Counter              | level, endpoint        | Number of messages in the log                                                        |
+| queue_job_dispatched_total      | Counter              | connection, queue, job | The number of jobs sent to the queue                                                 |
+| queue_job_runs_total            | Counter              | connection, queue, job | The number of processed jobs in the queue                                            |
+| queue_job_run_seconds_total     | Counter              | connection, queue, job | Time counter for completing tasks in the queue                                       |
+| command_runs_total              | Counter              | command, status        | Number of completed commands                                                         |
+| command_run_seconds_total       | Counter              | command, status        | Command execution time counter                                                       |
+| workers_total                   | Gauge                | worker                 | Number of swoole workers                                                             |
+| workers_idle                    | Gauge                | worker                 | Number of free swoole workers                                                        |
 
 ## Contributing
 
