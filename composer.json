@@ -6,7 +6,7 @@
     "require": {
         "php": "^8.2",
         "guzzlehttp/guzzle": "^7.0",
-        "ensi/laravel-prometheus": "^1.1.0",
+        "ensi/laravel-prometheus": "^1.2.0",
         "laravel/framework": "^12.0 || ^13.0",
         "psr/http-message": "^1.0"
     },

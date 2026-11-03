@@ -21,6 +21,16 @@ Publish the config with:
 php artisan vendor:publish --provider="Ensi\LaravelMetrics\MetricsServiceProvider"
 ```
 
+## Version Compatibility
+
+| Laravel Metrics | Laravel                                          | PHP  | Laravel Prometheus |
+|-----------------|--------------------------------------------------|------|--------------------|
+| ^1.0.0          | ^9.x                                             | ^8.1 | ^1.0               |
+| ^1.0.12         | ^9.x \|\| ^10.x                                  | ^8.1 | ^1.0.6             |
+| ^1.0.15         | ^9.x \|\| ^10.x \|\| ^11.x                       | ^8.1 | ^1.0.10            |
+| ^1.0.20         | ^9.x \|\| ^10.x \|\| ^11.x \|\| ^12.x            | ^8.1 | ^1.1.0             |
+| ^1.1.0          | ^12.x \|\| ^13.x                                 | ^8.2 | ^1.2.0             |
+
 ## Basic Usage
 
 Add Http Middleware
